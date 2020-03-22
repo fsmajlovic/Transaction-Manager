@@ -15,4 +15,65 @@ public class Transaction {
     };
     private String itemDescription;
     private int transactionInterval;
+    private Date endDate;
+
+    public Transaction() {
+    }
+
+    public Transaction(Date date, double amount, String title, String itemDescription, int transactionInterval, Date endDate) {
+        this.date = date;
+        this.amount = amount;
+        this.title = title;
+        this.itemDescription = itemDescription;
+        this.transactionInterval = transactionInterval;
+        this.endDate = endDate;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
+    public double getAmount() {
+        return amount;
+    }
+
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getItemDescription() {
+        return itemDescription;
+    }
+
+    public void setItemDescription(String itemDescription) {
+        this.itemDescription = itemDescription;
+    }
+
+    public int getTransactionInterval() {
+        return transactionInterval;
+    }
+
+    public void setTransactionInterval(int transactionInterval) {
+        this.transactionInterval = transactionInterval;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 }
