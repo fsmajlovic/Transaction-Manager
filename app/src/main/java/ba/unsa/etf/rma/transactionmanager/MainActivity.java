@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.media.Image;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -19,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView monthTextView;
     private ImageView arrowBackImageView;
     private ImageView arrowForwardImageView;
+    private Spinner sortBySpinner;
 
 
     @Override
@@ -27,13 +29,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         filterSpinner = (Spinner) findViewById(R.id.filterSpinner);
+        sortBySpinner = (Spinner) findViewById(R.id.sortBySpinner);
         monthTextView = (TextView) findViewById(R.id.monthTextView);
         arrowBackImageView = (ImageView) findViewById(R.id.arrowBackwardImageView);
         arrowForwardImageView = (ImageView) findViewById(R.id.arrowForwardImageView);
 
         //Month regulation
         final Calendar currentMonth = Calendar.getInstance();
-        final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM");
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyy");
         monthTextView.setText(dateFormat.format(currentMonth.getTime()));
 
         arrowBackImageView.setOnClickListener(new View.OnClickListener() {
@@ -52,8 +55,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-
+        //Sort by Spinner regulatons
+        String[] arrayStringSortBy = {
+                "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
+                "Date - Ascending", "Date - Descending"
+        };
+        ArrayAdapter<String> adapterSortBy = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, arrayStringSortBy);
+        adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sortBySpinner.setAdapter(adapterSortBy);
 
     }
 }

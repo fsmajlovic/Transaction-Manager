@@ -3,16 +3,18 @@ package ba.unsa.etf.rma.transactionmanager;
 import java.util.Date;
 
 public class Transaction {
-    private Date date;
-    private double amount;
-    private String title;
-    private enum type {
+    public enum Type {
         INDIVIDUALPAYMENT,
         REGULARPAYMENT,
         PURCHASE,
         INDIVIDUALINCOME,
         REGULARINCOME
     };
+
+    private Date date;
+    private double amount;
+    private String title;
+    private Type type;
     private String itemDescription;
     private int transactionInterval;
     private Date endDate;
@@ -20,10 +22,11 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(Date date, double amount, String title, String itemDescription, int transactionInterval, Date endDate) throws NameTooLongException {
+    public Transaction(Date date, double amount, String title, Type type, String itemDescription, int transactionInterval, Date endDate) {
         this.date = date;
         this.amount = amount;
-        setTitle(title);
+        this.title = title;
+        this.type = type;
         this.itemDescription = itemDescription;
         this.transactionInterval = transactionInterval;
         this.endDate = endDate;
@@ -49,9 +52,7 @@ public class Transaction {
         return title;
     }
 
-    public void setTitle(String title) throws NameTooLongException {
-        if(title.length() < 3 || title.length() > 15)
-            throw new NameTooLongException("Title is too long or too short.");
+    public void setTitle(String title){
         this.title = title;
     }
 
