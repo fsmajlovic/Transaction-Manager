@@ -94,4 +94,28 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/listView" />
+
+    <ImageView
+        android:id="@+id/arrowForwardImageView"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/sortBySpinner"
+        app:layout_constraintStart_toEndOf="@+id/monthTextView"
+        app:layout_constraintTop_toBottomOf="@+id/filterSpinner"
+        app:srcCompat="@drawable/ic_arrow_forward" />
+
+    <ImageView
+        android:id="@+id/arrowBackwardImageView"
+        android:layout_width="50dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="24dp"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/sortBySpinner"
+        app:layout_constraintEnd_toStartOf="@+id/monthTextView"
+        app:layout_constraintTop_toBottomOf="@+id/filterSpinner"
+        app:srcCompat="@drawable/ic_arrow_backward" />
 </androidx.constraintlayout.widget.ConstraintLayout>

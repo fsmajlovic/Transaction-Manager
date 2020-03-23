@@ -20,10 +20,10 @@ public class Transaction {
     public Transaction() {
     }
 
-    public Transaction(Date date, double amount, String title, String itemDescription, int transactionInterval, Date endDate) {
+    public Transaction(Date date, double amount, String title, String itemDescription, int transactionInterval, Date endDate) throws NameTooLongException {
         this.date = date;
         this.amount = amount;
-        this.title = title;
+        setTitle(title);
         this.itemDescription = itemDescription;
         this.transactionInterval = transactionInterval;
         this.endDate = endDate;
@@ -49,7 +49,9 @@ public class Transaction {
         return title;
     }
 
-    public void setTitle(String title) {
+    public void setTitle(String title) throws NameTooLongException {
+        if(title.length() < 3 || title.length() > 15)
+            throw new NameTooLongException("Title is too long or too short.");
         this.title = title;
     }
 
