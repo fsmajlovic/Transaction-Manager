@@ -13,6 +13,7 @@ import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageView arrowBackImageView;
     private ImageView arrowForwardImageView;
     private Spinner sortBySpinner;
+    private ArrayList<String> entries;
 
 
     @Override
@@ -55,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //Sort by Spinner regulatons
+        //Sort by Spinner regulations
         String[] arrayStringSortBy = {
                 "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
                 "Date - Ascending", "Date - Descending"
@@ -65,5 +67,14 @@ public class MainActivity extends AppCompatActivity {
         adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortBySpinner.setAdapter(adapterSortBy);
 
+        //Filter by Spinner regulations
+        filterSpinner = findViewById(R.id.filterSpinner);
+        String[] textArray = { "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
+                "REGURALINCOME"};
+        Integer[] imageArray = { R.drawable.ic_individual_payment_icon, R.drawable.ic_regular_payment_icon,
+                R.drawable.ic_purchase_icon, R.drawable.ic_individual_income_icon, R.drawable.ic_regular_income_icon };
+        FilterBySpinnerAdapter adapterFilterBySpinner = new FilterBySpinnerAdapter(this,
+                R.layout.custom_layout, textArray, imageArray);
+        filterSpinner.setAdapter(adapterFilterBySpinner);
     }
 }
