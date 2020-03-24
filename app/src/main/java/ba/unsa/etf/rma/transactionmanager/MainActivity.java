@@ -4,17 +4,23 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.media.Image;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private Spinner filterSpinner;
@@ -23,7 +29,11 @@ public class MainActivity extends AppCompatActivity {
     private ImageView arrowForwardImageView;
     private Spinner sortBySpinner;
     private ArrayList<String> entries;
-
+    private ListView listView;
+    private ArrayList<Transaction> transactions;
+    private userModel user;
+    private TransactionsListViewAdapter listViewAdapter;
+    private ArrayList<Transaction> filteredTransactions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +45,18 @@ public class MainActivity extends AppCompatActivity {
         monthTextView = (TextView) findViewById(R.id.monthTextView);
         arrowBackImageView = (ImageView) findViewById(R.id.arrowBackwardImageView);
         arrowForwardImageView = (ImageView) findViewById(R.id.arrowForwardImageView);
+        listView = (ListView) findViewById(R.id.listView);
+
+
+        //TransactionsPresenter regulations
+        try {
+            TransactionsPresenter presenter = new TransactionsPresenter();
+            transactions = presenter.getInteractor().getUser().getTransactions();
+            filteredTransactions = presenter.getInteractor().getUser().getTransactions();
+            user = presenter.getInteractor().getUser();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
 
         //Month regulation
         final Calendar currentMonth = Calendar.getInstance();
@@ -57,6 +79,28 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        monthTextView.addTextChangedListener(new TextWatcher() {
+            Date currentDateSelected = new Date();
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                try {
+                    currentDateSelected = new SimpleDateFormat("MMMM, yyy").parse(charSequence.toString());
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                //getSelectedCategoryDataByMonth(currentDateSelected, filteredTransactions);
+            }
+        });
+
         //Sort by Spinner regulations
         String[] arrayStringSortBy = {
                 "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
@@ -69,12 +113,49 @@ public class MainActivity extends AppCompatActivity {
 
         //Filter by Spinner regulations
         filterSpinner = findViewById(R.id.filterSpinner);
-        String[] textArray = { "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
-                "REGURALINCOME"};
-        Integer[] imageArray = { R.drawable.ic_individual_payment_icon, R.drawable.ic_regular_payment_icon,
+        final String[] textArray = { "All", "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
+                "REGULARINCOME"};
+        Integer[] imageArray = { R.drawable.ic_all_icon, R.drawable.ic_individual_payment_icon, R.drawable.ic_regular_payment_icon,
                 R.drawable.ic_purchase_icon, R.drawable.ic_individual_income_icon, R.drawable.ic_regular_income_icon };
         FilterBySpinnerAdapter adapterFilterBySpinner = new FilterBySpinnerAdapter(this,
                 R.layout.custom_layout, textArray, imageArray);
         filterSpinner.setAdapter(adapterFilterBySpinner);
+        filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
+                //currentDateSelected = new SimpleDateFormat("MMMM, yyy").parse(monthTextView.toString());
+                if(position >= 0 && position <= textArray.length) {
+                    getSelectedCategoryData(textArray[position], user.getTransactions());
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+        //ListView regulations
+        listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, transactions);
+        listView.setAdapter(listViewAdapter);
+
+    }
+
+    private void getSelectedCategoryData(String s, ArrayList<Transaction> transactions) {
+        filteredTransactions = new ArrayList<>();
+
+        if(s == "All"){
+            listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, transactions);
+            listView.setAdapter(listViewAdapter);
+        }
+        else{
+            for(Transaction t: transactions){
+                if(t.getType().toString() == s){
+                    filteredTransactions.add(t);
+                }
+            }
+            listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, filteredTransactions);
+            listView.setAdapter(listViewAdapter);
+        }
     }
 }
