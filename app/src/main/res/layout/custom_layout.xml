@@ -16,14 +16,15 @@
             android:id="@+id/spinnerImages"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            android:contentDescription="@string/app_name" />"
+            android:contentDescription="@string/app_name"
+            android:tint="@color/customStyleColor"/>"
 
         <TextView
             android:id="@+id/spinnerTextView"
             android:layout_height="40dp"
             android:layout_width="250dp"
             android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"/>
+            android:layout_marginRight="15dp" />
 
     </TableRow>
 

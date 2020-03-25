@@ -2,6 +2,9 @@ package ba.unsa.etf.rma.transactionmanager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ActionBar;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
@@ -46,7 +49,8 @@ public class MainActivity extends AppCompatActivity {
         arrowBackImageView = (ImageView) findViewById(R.id.arrowBackwardImageView);
         arrowForwardImageView = (ImageView) findViewById(R.id.arrowForwardImageView);
         listView = (ListView) findViewById(R.id.listView);
-
+        final String[] textArray = { "All", "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
+                "REGULARINCOME"};
 
         //TransactionsPresenter regulations
         try {
@@ -80,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
         monthTextView.addTextChangedListener(new TextWatcher() {
-            Date currentDateSelected = new Date();
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
@@ -88,16 +91,23 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                try {
-                    currentDateSelected = new SimpleDateFormat("MMMM, yyy").parse(charSequence.toString());
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+
             }
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //getSelectedCategoryDataByMonth(currentDateSelected, filteredTransactions);
+                String dateString = monthTextView.getText().toString();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+                Calendar calendarPass = Calendar.getInstance();
+                try {
+                    calendarPass.setTime(sdf.parse(dateString));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int position = filterSpinner.getSelectedItemPosition();
+                if(position >= 0 && position <= textArray.length) {
+                    getSelectedCategoryData(textArray[position], user.getTransactions(), calendarPass);
+                }
             }
         });
 
@@ -113,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Filter by Spinner regulations
         filterSpinner = findViewById(R.id.filterSpinner);
-        final String[] textArray = { "All", "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
-                "REGULARINCOME"};
         Integer[] imageArray = { R.drawable.ic_all_icon, R.drawable.ic_individual_payment_icon, R.drawable.ic_regular_payment_icon,
                 R.drawable.ic_purchase_icon, R.drawable.ic_individual_income_icon, R.drawable.ic_regular_income_icon };
         FilterBySpinnerAdapter adapterFilterBySpinner = new FilterBySpinnerAdapter(this,
@@ -123,9 +131,16 @@ public class MainActivity extends AppCompatActivity {
         filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> adapterView, View view, int position, long l) {
-                //currentDateSelected = new SimpleDateFormat("MMMM, yyy").parse(monthTextView.toString());
+                String dateString = monthTextView.getText().toString();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+                Calendar calendar = Calendar.getInstance();
+                try {
+                    calendar.setTime(sdf.parse(dateString));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
                 if(position >= 0 && position <= textArray.length) {
-                    getSelectedCategoryData(textArray[position], user.getTransactions());
+                    getSelectedCategoryData(textArray[position], user.getTransactions(), calendar);
                 }
             }
 
@@ -141,21 +156,24 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void getSelectedCategoryData(String s, ArrayList<Transaction> transactions) {
+    private void getSelectedCategoryData(String s, ArrayList<Transaction> transactions, Calendar calendar) {
         filteredTransactions = new ArrayList<>();
-
-        if(s == "All"){
-            listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, transactions);
-            listView.setAdapter(listViewAdapter);
-        }
-        else{
-            for(Transaction t: transactions){
-                if(t.getType().toString() == s){
+            for(Transaction t: transactions) {
+                Calendar tDate = Calendar.getInstance();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+                String dateString = sdf.format(t.getDate().getTime());
+                try {
+                    tDate.setTime(sdf.parse(dateString));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                if (tDate.compareTo(calendar) == 0 && t.getType().toString() == s) {
+                    filteredTransactions.add(t);
+                } else if (tDate.compareTo(calendar) == 0 && s == "All") {
                     filteredTransactions.add(t);
                 }
             }
             listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, filteredTransactions);
             listView.setAdapter(listViewAdapter);
-        }
     }
 }

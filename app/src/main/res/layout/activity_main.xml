@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@color/backgroundOne">
+    android:background="@color/ghostWhite">
 
     <TextView
         android:id="@+id/globalLimitTextView"
@@ -16,7 +16,8 @@
         android:gravity="center"
         android:text="Global amount: xxxx"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:textColor="@color/customStyleColor"/>
 
     <TextView
         android:id="@+id/limitTextView"
@@ -27,7 +28,8 @@
         android:gravity="center"
         android:text="Limit: xxxx"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/globalLimitTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/globalLimitTextView"
+        android:textColor="@color/customStyleColor"/>
 
     <Spinner
         android:id="@+id/filterSpinner"
@@ -53,7 +55,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/filterSpinner" />
+        app:layout_constraintTop_toBottomOf="@+id/filterSpinner"
+        android:fontFamily="sans-serif-thin" />
 
     <Spinner
         android:id="@+id/sortBySpinner"
@@ -73,9 +76,10 @@
         android:layout_height="37dp"
         android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="10dp"
         android:gravity="center"
         android:text="Add transaction"
+        android:textColor="@color/customStyleColor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
@@ -90,7 +94,8 @@
         app:layout_constraintBottom_toTopOf="@+id/sortBySpinner"
         app:layout_constraintStart_toEndOf="@+id/monthTextView"
         app:layout_constraintTop_toBottomOf="@+id/filterSpinner"
-        app:srcCompat="@drawable/ic_arrow_forward" />
+        app:srcCompat="@drawable/ic_arrow_forward"
+        android:tint="@color/customStyleColor"/>
 
     <ImageView
         android:id="@+id/arrowBackwardImageView"
@@ -102,7 +107,8 @@
         app:layout_constraintBottom_toTopOf="@+id/sortBySpinner"
         app:layout_constraintEnd_toStartOf="@+id/monthTextView"
         app:layout_constraintTop_toBottomOf="@+id/filterSpinner"
-        app:srcCompat="@drawable/ic_arrow_backward" />
+        app:srcCompat="@drawable/ic_arrow_backward"
+        android:tint="@color/customStyleColor" />
 
     <ListView
         android:layout_width="317dp"
@@ -110,7 +116,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="30dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="36dp"
         app:layout_constraintBottom_toTopOf="@+id/addTransactionTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
