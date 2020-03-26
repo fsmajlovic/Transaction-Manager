@@ -2,10 +2,6 @@ package ba.unsa.etf.rma.transactionmanager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActionBar;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,14 +12,20 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.Collections;
+
+import ba.unsa.etf.rma.transactionmanager.Comparators.DateComparatorAscending;
+import ba.unsa.etf.rma.transactionmanager.Comparators.DateComparatorDescending;
+import ba.unsa.etf.rma.transactionmanager.Comparators.PriceComparatorAscending;
+import ba.unsa.etf.rma.transactionmanager.Comparators.PriceComparatorDescending;
+import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorAscending;
+import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorDescending;
+
 
 public class MainActivity extends AppCompatActivity {
     private Spinner filterSpinner;
@@ -37,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private userModel user;
     private TransactionsListViewAdapter listViewAdapter;
     private ArrayList<Transaction> filteredTransactions;
+    private TextView globalAmountTextView;
+    private TextView limitTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,8 +53,15 @@ public class MainActivity extends AppCompatActivity {
         arrowBackImageView = (ImageView) findViewById(R.id.arrowBackwardImageView);
         arrowForwardImageView = (ImageView) findViewById(R.id.arrowForwardImageView);
         listView = (ListView) findViewById(R.id.listView);
+        globalAmountTextView = findViewById(R.id.globalAmountTextView);
+        limitTextView = findViewById(R.id.limitTextView);
         final String[] textArray = { "All", "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
                 "REGULARINCOME"};
+        String[] arrayStringSortBy = {
+                "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
+                "Date - Ascending", "Date - Descending"
+        };
+
 
         //TransactionsPresenter regulations
         try {
@@ -61,6 +72,10 @@ public class MainActivity extends AppCompatActivity {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        globalAmountTextView.setText("Global amount:" + user.getAccount().getBudget() + "$");
+        limitTextView.setText("Limit:" + user.getAccount().getTotalLimit() + "$");
+
+
 
         //Month regulation
         final Calendar currentMonth = Calendar.getInstance();
@@ -91,11 +106,6 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
                 String dateString = monthTextView.getText().toString();
                 SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
                 Calendar calendarPass = Calendar.getInstance();
@@ -109,17 +119,49 @@ public class MainActivity extends AppCompatActivity {
                     getSelectedCategoryData(textArray[position], user.getTransactions(), calendarPass);
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
         });
 
+
+        //ListView regulations
+        listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, transactions);
+        listView.setAdapter(listViewAdapter);
+
+
+
         //Sort by Spinner regulations
-        String[] arrayStringSortBy = {
-                "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
-                "Date - Ascending", "Date - Descending"
-        };
         ArrayAdapter<String> adapterSortBy = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, arrayStringSortBy);
         adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         sortBySpinner.setAdapter(adapterSortBy);
+        sortBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                String dateString = monthTextView.getText().toString();
+                SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+                Calendar calendarPass = Calendar.getInstance();
+                try {
+                    calendarPass.setTime(sdf.parse(dateString));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int position = filterSpinner.getSelectedItemPosition();
+                if(position >= 0 && position <= textArray.length) {
+                    getSelectedCategoryData(textArray[position], user.getTransactions(), calendarPass);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+        });
+
+
 
         //Filter by Spinner regulations
         filterSpinner = findViewById(R.id.filterSpinner);
@@ -150,9 +192,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        //ListView regulations
-        listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, transactions);
-        listView.setAdapter(listViewAdapter);
 
     }
 
@@ -167,12 +206,28 @@ public class MainActivity extends AppCompatActivity {
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
-                if (tDate.compareTo(calendar) == 0 && t.getType().toString() == s) {
+
+                if (s == "All" && tDate.compareTo(calendar) == 0) {
                     filteredTransactions.add(t);
-                } else if (tDate.compareTo(calendar) == 0 && s == "All") {
+                }
+                else if (tDate.compareTo(calendar) == 0 && t.getType().toString() == s) {
                     filteredTransactions.add(t);
                 }
             }
+
+            String selectedSort = sortBySpinner.getSelectedItem().toString();
+            if(selectedSort.equals("Price - Ascending"))
+                Collections.sort(filteredTransactions, new PriceComparatorAscending());
+            else if(selectedSort.equals("Price - Descending"))
+                Collections.sort(filteredTransactions, new PriceComparatorDescending());
+            else if(selectedSort.equals("Title - Ascending"))
+                Collections.sort(filteredTransactions, new TitleComparatorAscending());
+            else if(selectedSort.equals("Title - Descending"))
+                Collections.sort(filteredTransactions, new TitleComparatorDescending());
+            else if(selectedSort.equals("Date - Ascending"))
+                Collections.sort(filteredTransactions, new DateComparatorAscending());
+            else if(selectedSort.equals("Date - Descending"))
+                Collections.sort(filteredTransactions, new DateComparatorDescending());
             listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, filteredTransactions);
             listView.setAdapter(listViewAdapter);
     }

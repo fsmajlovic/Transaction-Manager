@@ -59,7 +59,7 @@ public class userModel {
                 "Office subscription", Transaction.Type.REGULARPAYMENT,
                 "Yearly microsoft office subscription.",
                 365, sdf.parse("10-02-2021")));
-        transactions.add( new Transaction(sdf.parse("15-03-2020"), 600,
+        transactions.add( new Transaction(sdf.parse("15-03-2020"), 655,
                 "Freelancer project", Transaction.Type.INDIVIDUALINCOME,
                 "Payment for finishing an android app project on your Freelancer profile.",
                 0,null));
@@ -81,7 +81,7 @@ public class userModel {
                 "Office subscription", Transaction.Type.REGULARPAYMENT,
                 "Yearly microsoft office subscription.",
                 365, sdf.parse("10-02-2021")));
-        transactions.add( new Transaction(sdf.parse("15-03-2020"), 600,
+        transactions.add( new Transaction(sdf.parse("15-03-2020"), 620,
                 "Freelancer project", Transaction.Type.INDIVIDUALINCOME,
                 "Payment for finishing an android app project on your Freelancer profile.",
                 0,null));
@@ -103,7 +103,7 @@ public class userModel {
                 "Office subscription", Transaction.Type.REGULARPAYMENT,
                 "Yearly microsoft office subscription.",
                 365, sdf.parse("10-02-2021")));
-        transactions.add( new Transaction(sdf.parse("15-03-2020"), 600,
+        transactions.add( new Transaction(sdf.parse("15-03-2020"), 619,
                 "Freelancer project", Transaction.Type.INDIVIDUALINCOME,
                 "Payment for finishing an android app project on your Freelancer profile.",
                 0,null));
