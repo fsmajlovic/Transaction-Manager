@@ -7,6 +7,9 @@
     <color name="customStyleColor">#880E4F</color>
     <color name="ghostWhite">#f8f8ff</color>
     <color name="customStyleColorDark">#5E0935</color>
+    <color name="saveBtnColor">#169617</color>
+    <color name="deleteBtnColor">#B41D1D</color>
+    <color name="shadow">#000000</color>
 
 
 </resources>

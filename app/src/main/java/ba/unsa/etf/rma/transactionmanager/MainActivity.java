@@ -2,6 +2,8 @@ package ba.unsa.etf.rma.transactionmanager;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 
+import ba.unsa.etf.rma.transactionmanager.Activities.TransactionDetailActivity;
 import ba.unsa.etf.rma.transactionmanager.Adapters.FilterBySpinnerAdapter;
 import ba.unsa.etf.rma.transactionmanager.Adapters.SortBySpinnerAdapter;
 import ba.unsa.etf.rma.transactionmanager.Adapters.TransactionsListViewAdapter;
@@ -130,11 +133,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-        //ListView regulations
-        listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, transactions);
-        listView.setAdapter(listViewAdapter);
-
-
 
         //Sort by Spinner regulations
         ArrayAdapter<String> adapterSortBy = new SortBySpinnerAdapter(this,
@@ -195,6 +193,21 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+
+
+        //ListView regulations
+        listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, transactions);
+        listView.setAdapter(listViewAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                Intent intent1 = new Intent(getApplicationContext(), TransactionDetailActivity.class);
+
+
+                startActivity(intent1);
+            }
+        });
 
     }
 
