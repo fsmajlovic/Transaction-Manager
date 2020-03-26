@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 
+import ba.unsa.etf.rma.transactionmanager.Adapters.FilterBySpinnerAdapter;
+import ba.unsa.etf.rma.transactionmanager.Adapters.SortBySpinnerAdapter;
+import ba.unsa.etf.rma.transactionmanager.Adapters.TransactionsListViewAdapter;
 import ba.unsa.etf.rma.transactionmanager.Comparators.DateComparatorAscending;
 import ba.unsa.etf.rma.transactionmanager.Comparators.DateComparatorDescending;
 import ba.unsa.etf.rma.transactionmanager.Comparators.PriceComparatorAscending;
@@ -134,9 +137,9 @@ public class MainActivity extends AppCompatActivity {
 
 
         //Sort by Spinner regulations
-        ArrayAdapter<String> adapterSortBy = new ArrayAdapter<String>(this,
+        ArrayAdapter<String> adapterSortBy = new SortBySpinnerAdapter(this,
                 android.R.layout.simple_spinner_item, arrayStringSortBy);
-        adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_item);
         sortBySpinner.setAdapter(adapterSortBy);
         sortBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override

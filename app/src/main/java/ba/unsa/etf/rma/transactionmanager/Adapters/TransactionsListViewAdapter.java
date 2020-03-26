@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.transactionmanager;
+package ba.unsa.etf.rma.transactionmanager.Adapters;
 
 import android.content.Context;
 import android.graphics.Movie;
@@ -12,6 +12,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ba.unsa.etf.rma.transactionmanager.R;
+import ba.unsa.etf.rma.transactionmanager.Transaction;
 
 public class TransactionsListViewAdapter extends ArrayAdapter<Transaction> {
     int resource;

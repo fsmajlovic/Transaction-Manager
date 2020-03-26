@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.transactionmanager;
+package ba.unsa.etf.rma.transactionmanager.Adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -14,6 +14,8 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import ba.unsa.etf.rma.transactionmanager.R;
 
 public class FilterBySpinnerAdapter  extends ArrayAdapter<String> {
     private String[] contentArray;

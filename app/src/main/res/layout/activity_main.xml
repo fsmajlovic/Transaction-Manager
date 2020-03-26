@@ -41,7 +41,9 @@
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/limitTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/limitTextView"
+        android:background="@color/customStyleColor"
+        android:popupBackground="@color/customStyleColor"/>
 
     <TextView
         android:id="@+id/monthTextView"
@@ -63,13 +65,16 @@
         android:layout_width="320dp"
         android:layout_height="40dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="0dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp"
         android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/monthTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/monthTextView"
+        android:background="@color/customStyleColor"
+        android:popupBackground="@color/customStyleColor"/>
 
     <TextView
         android:id="@+id/addTransactionTextView"
