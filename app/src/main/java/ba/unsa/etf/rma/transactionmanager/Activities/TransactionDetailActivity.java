@@ -12,6 +12,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
@@ -41,7 +45,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
         Intent intent = getIntent();
         final String receivedTitle = intent.getStringExtra("title");
-        String receivedDate = intent.getStringExtra("date");
+        final String receivedDate = intent.getStringExtra("date");
         String receivedAmount = intent.getStringExtra("amount");
         String receivedType = intent.getStringExtra("type");
         String receivedDescription = intent.getStringExtra("description");
@@ -81,7 +85,59 @@ public class TransactionDetailActivity extends AppCompatActivity{
         });
 
 
+        dateEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isDateValid = false;
+                DateFormat formatOne = new SimpleDateFormat("dd/MM/yyyy");
+                DateFormat formatTwo = new SimpleDateFormat("dd-MM-yyyy");
+
+                try {
+                    formatOne.parse(charSequence.toString());
+                    isDateValid = true;
+                } catch (ParseException e) {
+                    try {
+                        isDateValid = false;
+                        formatTwo.parse(charSequence.toString());
+                        isDateValid = true;
+                    } catch (ParseException e2) {
+                        //Already should be false
+                    }
+                }
+                if(isDateValid)
+                    dateEditText.setBackgroundColor(Color.parseColor("#008577"));
+                else
+                    dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(dateEditText.getText().toString().equals(receivedDate))
+                    dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+            }
+        });
 
 
+    }
+
+    public boolean validateDateFormat(String dateToValdate) {
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HHmmss");
+        //To make strict date format validation
+        formatter.setLenient(false);
+        Date parsedDate = null;
+        try {
+            parsedDate = formatter.parse(dateToValdate);
+            System.out.println("++validated DATE TIME ++"+formatter.format(parsedDate));
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 }
