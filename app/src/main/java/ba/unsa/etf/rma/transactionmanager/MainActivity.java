@@ -218,6 +218,7 @@ public class MainActivity extends AppCompatActivity {
                 intentListItem.putExtra("description", selectedTransaction.getItemDescription());
                 intentListItem.putExtra("endDate", endDate);
                 intentListItem.putExtra("interval", String.valueOf(selectedTransaction.getTransactionInterval()));
+                intentListItem.putExtra("typeArray", textArray);
 
                 startActivity(intentListItem);
             }

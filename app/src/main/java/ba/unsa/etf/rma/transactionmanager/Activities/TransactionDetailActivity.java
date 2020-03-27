@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,6 +16,7 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import ba.unsa.etf.rma.transactionmanager.R;
@@ -29,6 +31,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
     private EditText endDateEditText;
     private EditText intervalEditText;
     private ImageView typeImageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,24 +49,26 @@ public class TransactionDetailActivity extends AppCompatActivity{
         Intent intent = getIntent();
         final String receivedTitle = intent.getStringExtra("title");
         final String receivedDate = intent.getStringExtra("date");
-        String receivedAmount = intent.getStringExtra("amount");
-        String receivedType = intent.getStringExtra("type");
+        final String receivedAmount = intent.getStringExtra("amount");
+        final String receivedType = intent.getStringExtra("type");
         String receivedDescription = intent.getStringExtra("description");
         String receivedEndDate = intent.getStringExtra("endDate");
         String receivedInterval = intent.getStringExtra("interval");
+        final String[] typeArray = intent.getStringArrayExtra("typeArray");
 
 
         titleEditText.setText(receivedTitle);
         dateEditText.setText(receivedDate);
-        amountEditText.setText(receivedAmount + "$");
+        amountEditText.setText(receivedAmount);
         typeEditText.setText(receivedType);
         descriptionEditText.setText(receivedDescription);
         endDateEditText.setText(receivedEndDate);
-        typeImageView.setImageResource(R.drawable.ic_individual_payment_icon);
         intervalEditText.setText(receivedInterval);
 
 
-        //EditTextListeners
+
+
+        //EditText Listeners
         titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -83,8 +88,6 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     titleEditText.setBackgroundColor(Color.parseColor("#541068"));
             }
         });
-
-
         dateEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -122,22 +125,56 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     dateEditText.setBackgroundColor(Color.parseColor("#541068"));
             }
         });
+        amountEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.toString().matches("-?\\d+(\\.\\d+)?")) {
+                    amountEditText.setBackgroundColor(Color.parseColor("#008577"));
+                }
+                else
+                    amountEditText.setBackgroundColor(Color.parseColor("#541068"));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        typeEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isValid = false;
+                for(String s: typeArray){
+                    if(typeEditText.getText().toString().equals(s))
+                        isValid = true;
+                }
+                if(typeEditText.getText().toString().equals(receivedType))
+                    isValid = false;
+                if(isValid)
+                    typeEditText.setBackgroundColor(Color.parseColor("#008577"));
+                else
+                    typeEditText.setBackgroundColor(Color.parseColor("#541068"));
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+
+            }
+        });
 
 
     }
 
-    public boolean validateDateFormat(String dateToValdate) {
-
-        SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy HHmmss");
-        //To make strict date format validation
-        formatter.setLenient(false);
-        Date parsedDate = null;
-        try {
-            parsedDate = formatter.parse(dateToValdate);
-            System.out.println("++validated DATE TIME ++"+formatter.format(parsedDate));
-            return true;
-        } catch (ParseException e) {
-            return false;
-        }
-    }
 }
