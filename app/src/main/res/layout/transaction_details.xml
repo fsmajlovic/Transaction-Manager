@@ -21,7 +21,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/customStyleColor"
-        android:textColor="@color/ghostWhite"/>
+        android:textColor="@color/ghostWhite"
+        android:textStyle="bold|italic"/>
 
     <EditText
 
@@ -36,7 +37,8 @@
         android:textColor="@color/ghostWhite"
         android:textSize="15dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/titleEditText"
+        android:textStyle="bold|italic"/>
 
     <EditText
         android:textSize="15dp"
@@ -50,7 +52,8 @@
         android:text="DateTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleEditText"
-        android:textColor="@color/ghostWhite"/>
+        android:textColor="@color/ghostWhite"
+        android:textStyle="bold|italic"/>
 
     <EditText
         android:textSize="15dp"
@@ -64,10 +67,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dateEditText"
         android:background="@color/customStyleColor"
-        android:textColor="@color/ghostWhite"/>
+        android:textColor="@color/ghostWhite"
+        android:textStyle="bold|italic"/>
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/typeDetailsImageView"
         android:layout_width="80dp"
         android:layout_height="80dp"
         android:layout_marginTop="24dp"
@@ -93,8 +97,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2"
-        android:textColor="@color/ghostWhite"/>
+        app:layout_constraintTop_toBottomOf="@+id/typeDetailsImageView"
+        android:textColor="@color/ghostWhite"
+        android:textStyle="bold|italic"/>
 
     <EditText
         android:textSize="15dp"
@@ -108,7 +113,8 @@
         android:text="EndDate"
         android:textColor="@color/ghostWhite"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/descriptionEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/descriptionEditText"
+        android:textStyle="bold|italic"/>
 
     <EditText
         android:textSize="15dp"
@@ -122,7 +128,8 @@
         android:textColor="@color/ghostWhite"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/descriptionEditText"
-        tools:text="Interval" />
+        tools:text="Interval"
+        android:textStyle="bold|italic"/>
 
     <Button
         android:id="@+id/saveBtn"
@@ -137,7 +144,8 @@
         android:textColor="@color/ghostWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/endDateEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/endDateEditText"
+        android:textStyle="bold|italic"/>
 
     <Button
         android:id="@+id/deleteBtn"
@@ -152,7 +160,8 @@
         android:textColor="@color/ghostWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/intervalEditText" />
+        app:layout_constraintTop_toBottomOf="@+id/intervalEditText"
+        android:textStyle="bold|italic"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

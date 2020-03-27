@@ -203,13 +203,21 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 Transaction selectedTransaction = filteredTransactions.get(i);
+                SimpleDateFormat dateFormater = new SimpleDateFormat("dd-MM-yyyy");
+                String startDate = dateFormater.format(selectedTransaction.getDate().getTime());
+                String endDate = "";
+                if(selectedTransaction.getEndDate() != null)
+                    endDate = dateFormater.format(selectedTransaction.getEndDate().getTime());
+                else
+                    endDate = "No end date.";
                 Intent intentListItem = new Intent(getApplicationContext(), TransactionDetailActivity.class);
                 intentListItem.putExtra("title", selectedTransaction.getTitle());
+                intentListItem.putExtra("date", startDate);
                 intentListItem.putExtra("amount", String.valueOf(selectedTransaction.getAmount()));
                 intentListItem.putExtra("type", selectedTransaction.getType().toString());
                 intentListItem.putExtra("description", selectedTransaction.getItemDescription());
-                intentListItem.putExtra("endDate", selectedTransaction.getEndDate());
-                intentListItem.putExtra("interval", selectedTransaction.getTransactionInterval());
+                intentListItem.putExtra("endDate", endDate);
+                intentListItem.putExtra("interval", String.valueOf(selectedTransaction.getTransactionInterval()));
 
                 startActivity(intentListItem);
             }
