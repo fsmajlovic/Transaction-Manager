@@ -173,6 +173,26 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             }
         });
+        descriptionEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.length() == 0)
+                    descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+                else if(charSequence.length() > 0)
+                    descriptionEditText.setBackgroundColor(Color.parseColor("#008577"));
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                if(descriptionEditText.getText().toString().equals(receivedTitle))
+                    descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+            }
+        });
 
 
     }
