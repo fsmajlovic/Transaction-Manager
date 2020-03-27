@@ -15,6 +15,7 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -201,11 +202,16 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Transaction selectedTransaction = filteredTransactions.get(i);
+                Intent intentListItem = new Intent(getApplicationContext(), TransactionDetailActivity.class);
+                intentListItem.putExtra("title", selectedTransaction.getTitle());
+                intentListItem.putExtra("amount", String.valueOf(selectedTransaction.getAmount()));
+                intentListItem.putExtra("type", selectedTransaction.getType().toString());
+                intentListItem.putExtra("description", selectedTransaction.getItemDescription());
+                intentListItem.putExtra("endDate", selectedTransaction.getEndDate());
+                intentListItem.putExtra("interval", selectedTransaction.getTransactionInterval());
 
-                Intent intent1 = new Intent(getApplicationContext(), TransactionDetailActivity.class);
-
-
-                startActivity(intent1);
+                startActivity(intentListItem);
             }
         });
 
