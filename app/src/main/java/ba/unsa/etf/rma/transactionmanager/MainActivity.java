@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.transactionmanager;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -48,6 +49,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Transaction> filteredTransactions;
     private TextView globalAmountTextView;
     private TextView limitTextView;
+    private int selectedPosition;
+    private Transaction selectedTransaction;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -202,7 +205,7 @@ public class MainActivity extends AppCompatActivity {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                Transaction selectedTransaction = filteredTransactions.get(i);
+                selectedTransaction = filteredTransactions.get(i);
                 SimpleDateFormat dateFormater = new SimpleDateFormat("dd-MM-yyyy");
                 String startDate = dateFormater.format(selectedTransaction.getDate().getTime());
                 String endDate = "";
@@ -220,7 +223,8 @@ public class MainActivity extends AppCompatActivity {
                 intentListItem.putExtra("interval", String.valueOf(selectedTransaction.getTransactionInterval()));
                 intentListItem.putExtra("typeArray", textArray);
 
-                startActivity(intentListItem);
+                selectedPosition = i;
+                startActivityForResult(intentListItem, 0);
             }
         });
 
@@ -261,5 +265,61 @@ public class MainActivity extends AppCompatActivity {
                 Collections.sort(filteredTransactions, new DateComparatorDescending());
             listViewAdapter = new TransactionsListViewAdapter(this, R.layout.list_item, filteredTransactions);
             listView.setAdapter(listViewAdapter);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if(resultCode == RESULT_OK) {
+            String returnTitle = data.getStringExtra("returnTitle");
+            String returnDate = data.getStringExtra("returnDate");
+            String returnAmount = data.getStringExtra("returnAmount");
+            String returnType = data.getStringExtra("returnType");
+            String returnDescription = data.getStringExtra("returnDescription");
+            String returnEndDate = data.getStringExtra("returnEndDate");
+            String returnInterval = data.getStringExtra("returnInterval");
+
+            Transaction currentItem = (Transaction) listView.getItemAtPosition(selectedPosition);
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                currentItem.setTitle(returnTitle);
+                currentItem.setDate(sdf.parse(returnDate));
+                currentItem.setAmount(Double.valueOf(returnAmount));
+                currentItem.setItemDescription(returnDescription);
+                if(returnType.equals( "INDIVIDUALPAYMENT"))
+                    currentItem.setType(Transaction.Type.INDIVIDUALPAYMENT);
+                else if(returnType.equals("REGULARPAYMENT"))
+                    currentItem.setType(Transaction.Type.REGULARPAYMENT);
+                else if(returnType.equals("PURCHASE"))
+                    currentItem.setType(Transaction.Type.PURCHASE);
+                else if(returnType.equals("REGULARINCOME"))
+                    currentItem.setType(Transaction.Type.REGULARINCOME);
+                else if(returnType.equals("INDIVIDUALINCOME"))
+                    currentItem.setType(Transaction.Type.INDIVIDUALINCOME);
+
+                if(returnInterval.equals("0")) {
+                    currentItem.setEndDate(null);
+                }
+                else currentItem.setEndDate(sdf.parse(returnEndDate));
+                currentItem.setTransactionInterval(Integer.valueOf(returnInterval));
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        else if(resultCode == RESULT_CANCELED){
+            filteredTransactions.remove(selectedTransaction);
+            listView.invalidateViews();
+        }
+        listView.invalidateViews();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
     }
 }

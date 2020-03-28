@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -31,6 +33,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
     private EditText endDateEditText;
     private EditText intervalEditText;
     private ImageView typeImageView;
+    private Button saveBtn;
+    private Button deleteBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +48,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
         endDateEditText = (EditText) findViewById(R.id.endDateEditText);
         intervalEditText = (EditText) findViewById(R.id.intervalEditText);
         typeImageView = (ImageView) findViewById(R.id.typeDetailsImageView);
+        saveBtn = (Button) findViewById(R.id.saveBtn);
+        deleteBtn = (Button) findViewById(R.id.deleteBtn);
 
 
         Intent intent = getIntent();
@@ -194,7 +200,30 @@ public class TransactionDetailActivity extends AppCompatActivity{
             }
         });
 
+        saveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent returnIntent = new Intent();
+                returnIntent.putExtra("returnTitle", titleEditText.getText().toString());
+                returnIntent.putExtra("returnDate", dateEditText.getText().toString());
+                returnIntent.putExtra("returnAmount", amountEditText.getText().toString());
+                returnIntent.putExtra("returnType", typeEditText.getText().toString());
+                returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
+                returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
+                returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
+                setResult(RESULT_OK, returnIntent);
+                finish();
+            }
+        });
 
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent returnIntent = new Intent();
+                setResult(RESULT_CANCELED, returnIntent);
+                finish();
+            }
+        });
     }
 
 }
