@@ -1,5 +1,7 @@
 package ba.unsa.etf.rma.transactionmanager.Activities;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.io.Serializable;
@@ -21,6 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import ba.unsa.etf.rma.transactionmanager.MainActivity;
 import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
 
@@ -35,7 +39,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
     private ImageView typeImageView;
     private Button saveBtn;
     private Button deleteBtn;
-
+    private boolean titleVal = false, dateVal = false, amountVal = false, typeVal = false, descriptionVal = false,
+            endDateVal = false, intervalVal = false, savetrigger = true;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +58,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
 
         Intent intent = getIntent();
+        final double monthLimit = (double) intent.getDoubleExtra("monthLimit", 0.0);
+        final double globalLimit = intent.getDoubleExtra("globalLimit", 0.0);
         final String receivedTitle = intent.getStringExtra("title");
         final String receivedDate = intent.getStringExtra("date");
         final String receivedAmount = intent.getStringExtra("amount");
@@ -73,7 +80,6 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
 
 
-
         //EditText Listeners
         titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -82,10 +88,14 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length() == 0)
+                if(charSequence.length() == 0) {
                     titleEditText.setBackgroundColor(Color.parseColor("#541068"));
-                else if(charSequence.length() > 0)
-                    titleEditText.setBackgroundColor(Color.parseColor("#008577"));
+                    titleVal = false;
+                }
+                else if(charSequence.length() > 0) {
+                    titleEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    titleVal = true;
+                }
             }
 
             @Override
@@ -118,10 +128,14 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         //Already should be false
                     }
                 }
-                if(isDateValid)
-                    dateEditText.setBackgroundColor(Color.parseColor("#008577"));
-                else
+                if(isDateValid) {
+                    dateEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    dateVal = true;
+                }
+                else {
                     dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    dateVal = false;
+                }
 
             }
 
@@ -140,10 +154,13 @@ public class TransactionDetailActivity extends AppCompatActivity{
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(charSequence.toString().matches("-?\\d+(\\.\\d+)?")) {
-                    amountEditText.setBackgroundColor(Color.parseColor("#008577"));
+                    amountEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    amountVal = true;
                 }
-                else
+                else {
                     amountEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    amountVal = false;
+                }
             }
 
             @Override
@@ -161,16 +178,42 @@ public class TransactionDetailActivity extends AppCompatActivity{
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 boolean isValid = false;
                 for(String s: typeArray){
-                    if(typeEditText.getText().toString().equals(s))
+                    if(typeEditText.getText().toString().equals(s)) {
                         isValid = true;
+                    }
                 }
                 if(typeEditText.getText().toString().equals(receivedType))
                     isValid = false;
-                if(isValid)
-                    typeEditText.setBackgroundColor(Color.parseColor("#008577"));
-                else
+                if(isValid) {
+                    typeEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    typeVal = true;
+                }
+                else {
                     typeEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    typeVal = false;
+                }
 
+                if (!typeEditText.getText().toString().equals("REGULARINCOME") &&
+                        !typeEditText.getText().toString().equals("REGULARPAYMENT")) {
+                    endDateEditText.setEnabled(false);
+                    endDateEditText.setText("This type has no date.");
+                    intervalEditText.setEnabled(false);
+                    intervalEditText.setText("0");
+                    endDateEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    intervalEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    endDateVal = true;
+                    intervalVal = true;
+                }
+                else{
+                    endDateEditText.setEnabled(true);
+                    endDateEditText.setText("");
+                    intervalEditText.setEnabled(true);
+                    intervalEditText.setText("");
+                    endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    endDateVal = false;
+                    intervalVal = false;
+                }
             }
 
             @Override
@@ -187,10 +230,14 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length() == 0)
+                if(charSequence.length() == 0) {
                     descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
-                else if(charSequence.length() > 0)
-                    descriptionEditText.setBackgroundColor(Color.parseColor("#008577"));
+                    descriptionVal = false;
+                }
+                else if(charSequence.length() > 0) {
+                    descriptionEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    descriptionVal = true;
+                }
             }
 
             @Override
@@ -199,29 +246,166 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
             }
         });
+        endDateEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                boolean isDateValid = false;
+                DateFormat formatOne = new SimpleDateFormat("dd/MM/yyyy");
+                DateFormat formatTwo = new SimpleDateFormat("dd-MM-yyyy");
+
+                if (typeEditText.getText().toString().equals("REGULARINCOME") ||
+                        typeEditText.getText().toString().equals("REGULARPAYMENT")){
+                    try {
+                        formatOne.parse(charSequence.toString());
+                        isDateValid = true;
+                    } catch (ParseException e) {
+                        try {
+                            isDateValid = false;
+                            formatTwo.parse(charSequence.toString());
+                            isDateValid = true;
+                        } catch (ParseException e2) {
+                            //Already should be false
+                        }
+                    }
+                    if (isDateValid) {
+                        endDateEditText.setBackgroundColor(Color.parseColor("#169617"));
+                        endDateVal = true;
+                    }
+                    else {
+                        endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        endDateVal = false;
+                    }
+                }
+                else{
+
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+        intervalEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if(charSequence.toString().matches("\\d+")) {
+                    intervalEditText.setBackgroundColor(Color.parseColor("#169617"));
+                    intervalVal = true;
+                }
+                else {
+                    intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    intervalVal = false;
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
+
+        final Context ctx = this;
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent returnIntent = new Intent();
-                returnIntent.putExtra("returnTitle", titleEditText.getText().toString());
-                returnIntent.putExtra("returnDate", dateEditText.getText().toString());
-                returnIntent.putExtra("returnAmount", amountEditText.getText().toString());
-                returnIntent.putExtra("returnType", typeEditText.getText().toString());
-                returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
-                returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
-                returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
-                setResult(RESULT_OK, returnIntent);
-                finish();
+                final boolean trigger = true;
+                if(!titleVal || !dateVal || !amountVal || !typeVal || !descriptionVal || !endDateVal || !intervalVal)
+                {
+                    new AlertDialog.Builder(ctx, R.style.AlertDialog)
+                            .setTitle("Changes")
+                            .setMessage("Seems like some of your changes might be wrong or" +
+                                    " only partially edited (Green color indicates a correct change)." +
+                                    " Are you sure you want to continue?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    savetrigger = true;
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    savetrigger = false;
+                                }
+                            })
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+
+                }
+
+                if(savetrigger) {
+
+                    double doublevalue = 0;
+                    String text = amountEditText.getText().toString();
+                    if (!text.isEmpty())
+                        try {
+                            doublevalue = Double.parseDouble(text);
+                        } catch (Exception e1) {
+
+                            e1.printStackTrace();
+                        }
+                    if (globalLimit < doublevalue || monthLimit < doublevalue) {
+                        new AlertDialog.Builder(ctx, R.style.AlertDialog)
+                                .setTitle("Over limit")
+                                .setMessage("This transaction went over your month or global limit." +
+                                        "Are you sure you want to continue?")
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Intent returnIntent = new Intent();
+                                        returnIntent.putExtra("returnTitle", titleEditText.getText().toString());
+                                        returnIntent.putExtra("returnDate", dateEditText.getText().toString());
+                                        returnIntent.putExtra("returnAmount", amountEditText.getText().toString());
+                                        returnIntent.putExtra("returnType", typeEditText.getText().toString());
+                                        returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
+                                        returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
+                                        returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
+                                        setResult(RESULT_OK, returnIntent);
+                                    }
+                                })
+                                .setNegativeButton(android.R.string.no, null)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
+                    } else {
+                        Intent returnIntent = new Intent();
+                        returnIntent.putExtra("returnTitle", titleEditText.getText().toString());
+                        returnIntent.putExtra("returnDate", dateEditText.getText().toString());
+                        returnIntent.putExtra("returnAmount", amountEditText.getText().toString());
+                        returnIntent.putExtra("returnType", typeEditText.getText().toString());
+                        returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
+                        returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
+                        returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
+                        setResult(RESULT_OK, returnIntent);
+                    }
+                }
             }
         });
+
 
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent returnIntent = new Intent();
-                setResult(RESULT_CANCELED, returnIntent);
-                finish();
+                new AlertDialog.Builder(ctx, R.style.AlertDialog)
+                        .setTitle("Delete transaction")
+                        .setMessage("Are you sure you want to delete this transaction?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Intent returnIntent = new Intent();
+                                setResult(4, returnIntent);
+                                finish();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
             }
         });
     }

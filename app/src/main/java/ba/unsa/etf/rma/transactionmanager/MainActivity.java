@@ -212,8 +212,10 @@ public class MainActivity extends AppCompatActivity {
                 if(selectedTransaction.getEndDate() != null)
                     endDate = dateFormater.format(selectedTransaction.getEndDate().getTime());
                 else
-                    endDate = "No end date.";
+                    endDate = "This type has no end date.";
                 Intent intentListItem = new Intent(getApplicationContext(), TransactionDetailActivity.class);
+                intentListItem.putExtra("monthLimit", user.getAccount().getMonthLimit());
+                intentListItem.putExtra("globalLimit", user.getAccount().getTotalLimit());
                 intentListItem.putExtra("title", selectedTransaction.getTitle());
                 intentListItem.putExtra("date", startDate);
                 intentListItem.putExtra("amount", String.valueOf(selectedTransaction.getAmount()));
@@ -309,17 +311,12 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        else if(resultCode == RESULT_CANCELED){
+        else if(resultCode == 4){
             filteredTransactions.remove(selectedTransaction);
+            transactions.remove(selectedTransaction);
             listView.invalidateViews();
         }
         listView.invalidateViews();
-
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
 
     }
 }
