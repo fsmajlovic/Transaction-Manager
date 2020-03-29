@@ -36,7 +36,6 @@ public class TransactionDetailActivity extends AppCompatActivity{
     private EditText descriptionEditText;
     private EditText endDateEditText;
     private EditText intervalEditText;
-    private ImageView typeImageView;
     private Button saveBtn;
     private Button deleteBtn;
     private boolean titleVal = false, dateVal = false, amountVal = false, typeVal = false, descriptionVal = false,
@@ -52,7 +51,6 @@ public class TransactionDetailActivity extends AppCompatActivity{
         descriptionEditText = (EditText) findViewById(R.id.descriptionEditText);
         endDateEditText = (EditText) findViewById(R.id.endDateEditText);
         intervalEditText = (EditText) findViewById(R.id.intervalEditText);
-        typeImageView = (ImageView) findViewById(R.id.typeDetailsImageView);
         saveBtn = (Button) findViewById(R.id.saveBtn);
         deleteBtn = (Button) findViewById(R.id.deleteBtn);
 
@@ -81,6 +79,19 @@ public class TransactionDetailActivity extends AppCompatActivity{
         //Disable delete button if user chose to add transaction
         if(editOrAdd == true)
             deleteBtn.setEnabled(false);
+
+        //Disable end date and interval if type is not a regular one
+        if (!typeEditText.getText().toString().equals("REGULARINCOME") &&
+                !typeEditText.getText().toString().equals("REGULARPAYMENT")){
+            endDateEditText.setEnabled(false);
+            endDateEditText.setText("This type has no end date.");
+            intervalEditText.setEnabled(false);
+            intervalEditText.setText("0");
+            endDateEditText.setBackgroundColor(Color.parseColor("#169617"));
+            intervalEditText.setBackgroundColor(Color.parseColor("#169617"));
+            endDateVal = true;
+            intervalVal = true;
+        }
 
         //EditText Listeners
         titleEditText.addTextChangedListener(new TextWatcher() {
