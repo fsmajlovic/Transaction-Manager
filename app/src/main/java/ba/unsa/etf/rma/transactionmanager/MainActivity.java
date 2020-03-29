@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView limitTextView;
     private int selectedPosition;
     private Transaction selectedTransaction;
+    private TextView addTransactionTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.listView);
         globalAmountTextView = findViewById(R.id.globalAmountTextView);
         limitTextView = findViewById(R.id.limitTextView);
+        addTransactionTextView = findViewById(R.id.addTransactionTextView);
         final String[] textArray = { "All", "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
                 "REGULARINCOME"};
         String[] arrayStringSortBy = {
@@ -224,9 +226,29 @@ public class MainActivity extends AppCompatActivity {
                 intentListItem.putExtra("endDate", endDate);
                 intentListItem.putExtra("interval", String.valueOf(selectedTransaction.getTransactionInterval()));
                 intentListItem.putExtra("typeArray", textArray);
-
+                intentListItem.putExtra("edit/add", false);
                 selectedPosition = i;
                 startActivityForResult(intentListItem, 0);
+            }
+        });
+
+        //Add transaction regulations
+        addTransactionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentAddTransaction = new Intent(getApplicationContext(), TransactionDetailActivity.class);
+                intentAddTransaction.putExtra("monthLimit", user.getAccount().getMonthLimit());
+                intentAddTransaction.putExtra("globalLimit", user.getAccount().getTotalLimit());
+                intentAddTransaction.putExtra("title", "");
+                intentAddTransaction.putExtra("date", "");
+                intentAddTransaction.putExtra("amount", "");
+                intentAddTransaction.putExtra("type", "");
+                intentAddTransaction.putExtra("description", "");
+                intentAddTransaction.putExtra("endDate", "");
+                intentAddTransaction.putExtra("interval", "");
+                intentAddTransaction.putExtra("typeArray", textArray);
+                intentAddTransaction.putExtra("edit/add", true);
+                startActivityForResult(intentAddTransaction, 0);
             }
         });
 
@@ -273,8 +295,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-
-        if(resultCode == RESULT_OK) {
+        if(resultCode == 1) {
             String returnTitle = data.getStringExtra("returnTitle");
             String returnDate = data.getStringExtra("returnDate");
             String returnAmount = data.getStringExtra("returnAmount");
@@ -311,10 +332,48 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
-        else if(resultCode == 4){
+        else if(resultCode == 2){
             filteredTransactions.remove(selectedTransaction);
             transactions.remove(selectedTransaction);
-            listView.invalidateViews();
+        }
+        else if(resultCode == 3){
+            Transaction addTransaction = new Transaction();
+            String returnTitle = data.getStringExtra("returnTitle");
+            String returnDate = data.getStringExtra("returnDate");
+            String returnAmount = data.getStringExtra("returnAmount");
+            String returnType = data.getStringExtra("returnType");
+            String returnDescription = data.getStringExtra("returnDescription");
+            String returnEndDate = data.getStringExtra("returnEndDate");
+            String returnInterval = data.getStringExtra("returnInterval");
+
+            addTransaction.setTitle(returnTitle);
+            addTransaction.setAmount(Double.valueOf(returnAmount));
+            addTransaction.setItemDescription(returnDescription);
+            if(returnType.equals( "INDIVIDUALPAYMENT"))
+                addTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+            else if(returnType.equals("REGULARPAYMENT"))
+                addTransaction.setType(Transaction.Type.REGULARPAYMENT);
+            else if(returnType.equals("PURCHASE"))
+                addTransaction.setType(Transaction.Type.PURCHASE);
+            else if(returnType.equals("REGULARINCOME"))
+                addTransaction.setType(Transaction.Type.REGULARINCOME);
+            else if(returnType.equals("INDIVIDUALINCOME"))
+                addTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                addTransaction.setDate(sdf.parse(returnDate));
+                if(returnInterval.equals("0")) {
+                    addTransaction.setEndDate(null);
+                }
+                else addTransaction.setEndDate(sdf.parse(returnEndDate));
+                addTransaction.setTransactionInterval(Integer.valueOf(returnInterval));
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            filteredTransactions.add(addTransaction);
+            transactions.add(addTransaction);
+            listViewAdapter.notifyDataSetChanged();
         }
         listView.invalidateViews();
 

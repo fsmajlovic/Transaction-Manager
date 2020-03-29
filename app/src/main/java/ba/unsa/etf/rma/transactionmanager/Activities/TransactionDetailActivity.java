@@ -68,7 +68,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
         String receivedEndDate = intent.getStringExtra("endDate");
         String receivedInterval = intent.getStringExtra("interval");
         final String[] typeArray = intent.getStringArrayExtra("typeArray");
-
+        final boolean editOrAdd = intent.getBooleanExtra("edit/add", false);
 
         titleEditText.setText(receivedTitle);
         dateEditText.setText(receivedDate);
@@ -78,7 +78,9 @@ public class TransactionDetailActivity extends AppCompatActivity{
         endDateEditText.setText(receivedEndDate);
         intervalEditText.setText(receivedInterval);
 
-
+        //Disable delete button if user chose to add transaction
+        if(editOrAdd == true)
+            deleteBtn.setEnabled(false);
 
         //EditText Listeners
         titleEditText.addTextChangedListener(new TextWatcher() {
@@ -196,7 +198,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
                 if (!typeEditText.getText().toString().equals("REGULARINCOME") &&
                         !typeEditText.getText().toString().equals("REGULARPAYMENT")) {
                     endDateEditText.setEnabled(false);
-                    endDateEditText.setText("This type has no date.");
+                    endDateEditText.setText("This type has no end date.");
                     intervalEditText.setEnabled(false);
                     intervalEditText.setText("0");
                     endDateEditText.setBackgroundColor(Color.parseColor("#169617"));
@@ -330,6 +332,13 @@ public class TransactionDetailActivity extends AppCompatActivity{
                             .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     savetrigger = true;
+                                    titleEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                    dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                    amountEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                    typeEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                    descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                    endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                    intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
                                 }
                             })
                             .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
@@ -368,7 +377,12 @@ public class TransactionDetailActivity extends AppCompatActivity{
                                         returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
                                         returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
                                         returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
-                                        setResult(RESULT_OK, returnIntent);
+                                        if(editOrAdd) {
+                                            setResult(3, returnIntent);
+                                            finish();
+                                        }
+                                        else
+                                            setResult(1, returnIntent);
                                     }
                                 })
                                 .setNegativeButton(android.R.string.no, null)
@@ -383,7 +397,12 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
                         returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
                         returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
-                        setResult(RESULT_OK, returnIntent);
+                        if(editOrAdd) {
+                            setResult(3, returnIntent);
+                            finish();
+                        }
+                        else
+                            setResult(1, returnIntent);
                     }
                 }
             }
@@ -399,7 +418,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 Intent returnIntent = new Intent();
-                                setResult(4, returnIntent);
+                                setResult(2, returnIntent);
                                 finish();
                             }
                         })
