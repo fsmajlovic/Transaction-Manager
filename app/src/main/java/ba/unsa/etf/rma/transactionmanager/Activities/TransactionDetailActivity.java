@@ -38,8 +38,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
     private EditText intervalEditText;
     private Button saveBtn;
     private Button deleteBtn;
-    private boolean titleVal = false, dateVal = false, amountVal = false, typeVal = false, descriptionVal = false,
-            endDateVal = false, intervalVal = false, savetrigger = true;
+    private boolean titleVal = true, dateVal = true, amountVal = true, typeVal = true, descriptionVal = true,
+            endDateVal = true, intervalVal = true, savetrigger = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +56,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
 
         Intent intent = getIntent();
-        final double monthLimit = (double) intent.getDoubleExtra("monthLimit", 0.0);
-        final double globalLimit = intent.getDoubleExtra("globalLimit", 0.0);
+        final double monthSpent = (double) intent.getDoubleExtra("monthSpent", 0.0);
+        final double totalSpent = intent.getDoubleExtra("totalSpent", 0.0);
         final String receivedTitle = intent.getStringExtra("title");
         final String receivedDate = intent.getStringExtra("date");
         final String receivedAmount = intent.getStringExtra("amount");
@@ -101,8 +101,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if(charSequence.length() == 0) {
-                    titleEditText.setBackgroundColor(Color.parseColor("#541068"));
+                if(charSequence.length() < 4 || charSequence.length() > 15) {
+                    titleEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                     titleVal = false;
                 }
                 else if(charSequence.length() > 0) {
@@ -113,8 +113,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(titleEditText.getText().toString().equals(receivedTitle))
-                    titleEditText.setBackgroundColor(Color.parseColor("#541068"));
+//                if(titleEditText.getText().toString().equals(receivedTitle))
+//                    titleEditText.setBackgroundColor(Color.parseColor("#541068"));
             }
         });
         dateEditText.addTextChangedListener(new TextWatcher() {
@@ -146,7 +146,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     dateVal = true;
                 }
                 else {
-                    dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    dateEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                     dateVal = false;
                 }
 
@@ -154,8 +154,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(dateEditText.getText().toString().equals(receivedDate))
-                    dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                //if(dateEditText.getText().toString().equals(receivedDate))
+                  //  dateEditText.setBackgroundColor(Color.parseColor("#541068"));
             }
         });
         amountEditText.addTextChangedListener(new TextWatcher() {
@@ -171,7 +171,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     amountVal = true;
                 }
                 else {
-                    amountEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    amountEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                     amountVal = false;
                 }
             }
@@ -202,7 +202,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     typeVal = true;
                 }
                 else {
-                    typeEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    typeEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                     typeVal = false;
                 }
 
@@ -222,8 +222,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     endDateEditText.setText("");
                     intervalEditText.setEnabled(true);
                     intervalEditText.setText("");
-                    endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
-                    intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    endDateEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
+                    intervalEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                     endDateVal = false;
                     intervalVal = false;
                 }
@@ -244,7 +244,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
             @Override
             public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
                 if(charSequence.length() == 0) {
-                    descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    descriptionEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                     descriptionVal = false;
                 }
                 else if(charSequence.length() > 0) {
@@ -255,8 +255,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void afterTextChanged(Editable editable) {
-                if(descriptionEditText.getText().toString().equals(receivedTitle))
-                    descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+
             }
         });
         endDateEditText.addTextChangedListener(new TextWatcher() {
@@ -290,7 +289,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         endDateVal = true;
                     }
                     else {
-                        endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        endDateEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                         endDateVal = false;
                     }
                 }
@@ -317,7 +316,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     intervalVal = true;
                 }
                 else {
-                    intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
+                    intervalEditText.setBackgroundColor(Color.parseColor("#B41D1D"));
                     intervalVal = false;
                 }
             }
@@ -332,35 +331,23 @@ public class TransactionDetailActivity extends AppCompatActivity{
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                final boolean trigger = true;
                 if(!titleVal || !dateVal || !amountVal || !typeVal || !descriptionVal || !endDateVal || !intervalVal)
                 {
+                    savetrigger = false;
                     new AlertDialog.Builder(ctx, R.style.AlertDialog)
                             .setTitle("Changes")
                             .setMessage("Seems like some of your changes might be wrong or" +
-                                    " only partially edited (Green color indicates a correct change)." +
-                                    " Are you sure you want to continue?")
-                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    " only partially edited (Green color indicates a correct change).")
+                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    savetrigger = true;
-                                    titleEditText.setBackgroundColor(Color.parseColor("#541068"));
-                                    dateEditText.setBackgroundColor(Color.parseColor("#541068"));
-                                    amountEditText.setBackgroundColor(Color.parseColor("#541068"));
-                                    typeEditText.setBackgroundColor(Color.parseColor("#541068"));
-                                    descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
-                                    endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
-                                    intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
-                                }
-                            })
-                            .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    savetrigger = false;
                                 }
                             })
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show();
 
                 }
+                else
+                    savetrigger = true;
 
                 if(savetrigger) {
 
@@ -373,7 +360,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
                             e1.printStackTrace();
                         }
-                    if (globalLimit < doublevalue || monthLimit < doublevalue) {
+                    if (5000 < doublevalue) {
                         new AlertDialog.Builder(ctx, R.style.AlertDialog)
                                 .setTitle("Over limit")
                                 .setMessage("This transaction went over your month or global limit." +
@@ -392,8 +379,17 @@ public class TransactionDetailActivity extends AppCompatActivity{
                                             setResult(3, returnIntent);
                                             finish();
                                         }
-                                        else
+                                        else {
                                             setResult(1, returnIntent);
+                                        }
+                                        setResult(1, returnIntent);
+                                        titleEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                        dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                        amountEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                        typeEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                        descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                        endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                                        intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
                                     }
                                 })
                                 .setNegativeButton(android.R.string.no, null)
@@ -408,12 +404,21 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
                         returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
                         returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
+                        setResult(1, returnIntent);
+                        titleEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        amountEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        typeEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
+                        intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
                         if(editOrAdd) {
                             setResult(3, returnIntent);
                             finish();
                         }
-                        else
+                        else {
                             setResult(1, returnIntent);
+                        }
                     }
                 }
             }
