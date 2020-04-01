@@ -20,4 +20,8 @@ public class TransactionsPresenter {
     public void setInteractor(TransactionsInteractor interactor) {
         this.interactor = interactor;
     }
+
+    public void setBudget(double budget) {
+        interactor.getAccount().setBudget(budget);
+    }
 }

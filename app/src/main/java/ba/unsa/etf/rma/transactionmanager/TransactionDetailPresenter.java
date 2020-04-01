@@ -70,7 +70,4 @@ public class TransactionDetailPresenter implements ITransactionDetailPresenter{
         }
     }
 
-    public void setBudget(double budget) {
-        interactor.getAccount().setBudget(budget);
-    }
 }

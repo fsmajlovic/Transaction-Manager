@@ -334,14 +334,21 @@ public class MainActivity extends AppCompatActivity {
             if(!dateString.equals(monthTextView.getText().toString()))
                 filteredTransactions.remove(selectedPosition);
             //Updating budget
+            double newBudget = budget;
             if (returnType.equals("INDIVIDUALPAYMENT") || returnType.equals("PURCHASE") ||
                     returnType.equals("INDIVIDUALPAYMENT")) {
-                double newBudget = budget - Double.valueOf(returnAmount);
+                newBudget = budget - Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
             }
             else if (returnType.equals("INDIVIDUALINCOME") || returnType.equals("REGULARINCOME")) {
-                double newBudget = budget + Double.valueOf(returnAmount);
+                newBudget = budget + Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
+            }
+            try {
+                TransactionsPresenter presenter = new TransactionsPresenter();
+                presenter.setBudget(newBudget);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
         else if(resultCode == 2){
@@ -393,14 +400,21 @@ public class MainActivity extends AppCompatActivity {
 
 
             //Updating budget
+            double newBudget = budget;
             if (returnType.equals("INDIVIDUALPAYMENT") || returnType.equals("PURCHASE") ||
-            returnType.equals("INDIVIDUALPAYMENT")) {
-                double newBudget = budget - Double.valueOf(returnAmount);
+                    returnType.equals("INDIVIDUALPAYMENT")) {
+                newBudget = budget - Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
             }
             else if (returnType.equals("INDIVIDUALINCOME") || returnType.equals("REGULARINCOME")) {
-                double newBudget = budget + Double.valueOf(returnAmount);
+                newBudget = budget + Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
+            }
+            try {
+                TransactionsPresenter presenter = new TransactionsPresenter();
+                presenter.setBudget(newBudget);
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
         }
         listViewAdapter.notifyDataSetChanged();
