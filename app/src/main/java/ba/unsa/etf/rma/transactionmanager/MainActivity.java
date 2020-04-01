@@ -333,6 +333,16 @@ public class MainActivity extends AppCompatActivity {
             String dateString = sdf.format(currentItem.getDate().getTime());
             if(!dateString.equals(monthTextView.getText().toString()))
                 filteredTransactions.remove(selectedPosition);
+            //Updating budget
+            if (returnType.equals("INDIVIDUALPAYMENT") || returnType.equals("PURCHASE") ||
+                    returnType.equals("INDIVIDUALPAYMENT")) {
+                double newBudget = budget - Double.valueOf(returnAmount);
+                globalAmountTextView.setText("Global amount: $" + newBudget);
+            }
+            else if (returnType.equals("INDIVIDUALINCOME") || returnType.equals("REGULARINCOME")) {
+                double newBudget = budget + Double.valueOf(returnAmount);
+                globalAmountTextView.setText("Global amount: $" + newBudget);
+            }
         }
         else if(resultCode == 2){
             filteredTransactions.remove(selectedTransaction);
@@ -380,15 +390,15 @@ public class MainActivity extends AppCompatActivity {
             String dateString = sdf.format(addTransaction.getDate().getTime());
             if(dateString.equals(monthTextView.getText().toString()))
                 filteredTransactions.add(addTransaction);
-//            transactions.add(addTransaction);
 
 
             //Updating budget
-            if (returnType.contains("PAYMENT") || returnType.contains("PURCHASE")) {
+            if (returnType.equals("INDIVIDUALPAYMENT") || returnType.equals("PURCHASE") ||
+            returnType.equals("INDIVIDUALPAYMENT")) {
                 double newBudget = budget - Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
             }
-            else if (returnType.contains("INCOME")) {
+            else if (returnType.equals("INDIVIDUALINCOME") || returnType.equals("REGULARINCOME")) {
                 double newBudget = budget + Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
             }
@@ -396,6 +406,21 @@ public class MainActivity extends AppCompatActivity {
         listViewAdapter.notifyDataSetChanged();
         listView.invalidateViews();
 
+        //Filtering again
+        final String[] textArray = { "All", "INDIVIDUALPAYMENT", "REGULARPAYMENT", "PURCHASE", "INDIVIDUALINCOME",
+                "REGULARINCOME"};
+        String dateString = monthTextView.getText().toString();
+        SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+        Calendar calendarPass = Calendar.getInstance();
+        try {
+            calendarPass.setTime(sdf.parse(dateString));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        int position = filterSpinner.getSelectedItemPosition();
+        if(position >= 0 && position <= textArray.length) {
+            getSelectedCategoryData(textArray[position], userTransactions, calendarPass);
+        }
 
     }
 

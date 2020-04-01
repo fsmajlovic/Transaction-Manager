@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class userModel {
-    public static Account account = new Account(100000.0, 60000.0, 5000.0);
+    public static Account account = new Account(100000.0, 20000.0, 5000.0);
     public static ArrayList<Transaction> transactions;
 
     static {

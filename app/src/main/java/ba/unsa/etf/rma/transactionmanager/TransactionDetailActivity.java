@@ -22,6 +22,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import ba.unsa.etf.rma.transactionmanager.MainActivity;
@@ -370,10 +371,44 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
                             e1.printStackTrace();
                         }
-                    if (newAmount + totalSpent > 60000.0) {
+                    SimpleDateFormat sdf2 = new SimpleDateFormat("dd-MM-yyyy");
+                    Calendar calOne = Calendar.getInstance();
+                    Calendar calTwo = Calendar.getInstance();
+                    try {
+                        calTwo.setTime(sdf2.parse(dateEditText.getText().toString()));
+                        presenter = new TransactionDetailPresenter(ctx);
+                        for(Transaction t: presenter.getInteractor().getTransactions()) {
+                            if(t.getType().toString().equals("PURCHASE") || t.getType().toString().equals("REGULARPAYMENT") ||
+                            t.getType().toString().equals("INDIVIDUALPAYMENT")){
+                                totalSpent = totalSpent + t.getAmount();
+                                calOne.setTime(t.getDate());
+                                int monthOne = calOne.get(Calendar.MONTH);
+                                int monthTwo = calTwo.get(Calendar.MONTH);
+                                if (monthOne == monthTwo)
+                                    monthSpent = monthSpent + t.getAmount();
+                            }
+                        }
+                        System.out.println("Total spent: " + totalSpent);
+                        System.out.println("Month spent: " + monthSpent);
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    String whatWentOver = "";
+                    if(newAmount + monthSpent > 5000.0)
+                        whatWentOver = "month";
+                    if(newAmount + totalSpent > 20000.0)
+                        whatWentOver = "global";
+                    if ((newAmount + totalSpent > 20000.0 || newAmount + monthSpent > 5000.0) &&
+                            (typeEditText.getText().toString().equals("INDIVIDUALPAYMENT") ||
+                                    typeEditText.getText().toString().equals("PURCHASE") ||
+                                            typeEditText.getText().toString().equals("REGULARPAYMENT"))) {
                         new AlertDialog.Builder(ctx, R.style.AlertDialog)
                                 .setTitle("Over limit")
-                                .setMessage("This transaction went over your month or global limit." +
+                                .setMessage("This transaction went over your " + whatWentOver +
+                                        " limit. In this month you've spent: $" + monthSpent + " (limit is $5000) and " +
+                                                "in total you've spent: $" + totalSpent + " (limit is $20000)." +
                                         "Are you sure you want to continue?")
                                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                                     public void onClick(DialogInterface dialog, int which) {
@@ -642,7 +677,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
                                 for(Transaction t: presenter.getInteractor().getTransactions())
                                     System.out.println(t.getTitle());
-                                
+
                                 Intent returnIntent = new Intent();
                                 setResult(2, returnIntent);
                                 finish();
