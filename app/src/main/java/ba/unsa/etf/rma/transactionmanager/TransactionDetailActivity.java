@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.transactionmanager.Activities;
+package ba.unsa.etf.rma.transactionmanager;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -38,8 +38,22 @@ public class TransactionDetailActivity extends AppCompatActivity{
     private EditText intervalEditText;
     private Button saveBtn;
     private Button deleteBtn;
+    private Transaction transaction;
+    private ArrayList<Transaction> transactions;
     private boolean titleVal = true, dateVal = true, amountVal = true, typeVal = true, descriptionVal = true,
             endDateVal = true, intervalVal = true, savetrigger = false;
+    private double monthSpent = 0.0;
+    private double totalSpent = 0.0;
+
+    private ITransactionDetailPresenter presenter;
+
+    public ITransactionDetailPresenter getPresenter() throws ParseException {
+        if (presenter == null) {
+            presenter = new TransactionDetailPresenter(this);
+        }
+        return presenter;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,8 +70,6 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
 
         Intent intent = getIntent();
-        final double monthSpent = (double) intent.getDoubleExtra("monthSpent", 0.0);
-        final double totalSpent = intent.getDoubleExtra("totalSpent", 0.0);
         final String receivedTitle = intent.getStringExtra("title");
         final String receivedDate = intent.getStringExtra("date");
         final String receivedAmount = intent.getStringExtra("amount");
@@ -67,6 +79,8 @@ public class TransactionDetailActivity extends AppCompatActivity{
         String receivedInterval = intent.getStringExtra("interval");
         final String[] typeArray = intent.getStringArrayExtra("typeArray");
         final boolean editOrAdd = intent.getBooleanExtra("edit/add", false);
+
+
 
         titleEditText.setText(receivedTitle);
         dateEditText.setText(receivedDate);
@@ -113,8 +127,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void afterTextChanged(Editable editable) {
-//                if(titleEditText.getText().toString().equals(receivedTitle))
-//                    titleEditText.setBackgroundColor(Color.parseColor("#541068"));
+
             }
         });
         dateEditText.addTextChangedListener(new TextWatcher() {
@@ -154,8 +167,7 @@ public class TransactionDetailActivity extends AppCompatActivity{
 
             @Override
             public void afterTextChanged(Editable editable) {
-                //if(dateEditText.getText().toString().equals(receivedDate))
-                  //  dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+
             }
         });
         amountEditText.addTextChangedListener(new TextWatcher() {
@@ -336,31 +348,29 @@ public class TransactionDetailActivity extends AppCompatActivity{
                     savetrigger = false;
                     new AlertDialog.Builder(ctx, R.style.AlertDialog)
                             .setTitle("Changes")
-                            .setMessage("Seems like some of your changes might be wrong or" +
-                                    " only partially edited (Green color indicates a correct change).")
+                            .setMessage("Seems like some of your changes might be wrong.(Red color indicates an incorrect change).")
                             .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                 }
                             })
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .show();
-
                 }
                 else
                     savetrigger = true;
 
                 if(savetrigger) {
 
-                    double doublevalue = 0;
+                    double newAmount = 0;
                     String text = amountEditText.getText().toString();
                     if (!text.isEmpty())
                         try {
-                            doublevalue = Double.parseDouble(text);
+                            newAmount = Double.parseDouble(text);
                         } catch (Exception e1) {
 
                             e1.printStackTrace();
                         }
-                    if (5000 < doublevalue) {
+                    if (newAmount + totalSpent > 60000.0) {
                         new AlertDialog.Builder(ctx, R.style.AlertDialog)
                                 .setTitle("Over limit")
                                 .setMessage("This transaction went over your month or global limit." +
@@ -375,12 +385,88 @@ public class TransactionDetailActivity extends AppCompatActivity{
                                         returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
                                         returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
                                         returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
+
+                                        /////////////////////////////////////////////////////////////////////////////////////
+                                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                                        Transaction newTransaction = new Transaction();
+
+                                        newTransaction.setTitle(titleEditText.getText().toString());
+                                        newTransaction.setAmount(Double.valueOf(amountEditText.getText().toString()));
+                                        newTransaction.setItemDescription(descriptionEditText.getText().toString());
+                                        if(typeEditText.getText().toString().equals( "INDIVIDUALPAYMENT"))
+                                            newTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+                                        else if(typeEditText.getText().toString().equals("REGULARPAYMENT"))
+                                            newTransaction.setType(Transaction.Type.REGULARPAYMENT);
+                                        else if(typeEditText.getText().toString().equals("PURCHASE"))
+                                            newTransaction.setType(Transaction.Type.PURCHASE);
+                                        else if(typeEditText.getText().toString().equals("REGULARINCOME"))
+                                            newTransaction.setType(Transaction.Type.REGULARINCOME);
+                                        else if(typeEditText.getText().toString().equals("INDIVIDUALINCOME"))
+                                            newTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+                                        try {
+                                            newTransaction.setDate(sdf.parse(dateEditText.getText().toString()));
+                                            if(intervalEditText.getText().toString().equals("0")) {
+                                                newTransaction.setEndDate(null);
+                                            }
+                                            else newTransaction.setEndDate(sdf.parse(endDateEditText.getText().toString()));
+                                            newTransaction.setTransactionInterval(Integer.valueOf(intervalEditText.getText().toString()));
+
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        }
+
                                         if(editOrAdd) {
                                             setResult(3, returnIntent);
+                                            try {
+                                                presenter = new TransactionDetailPresenter(ctx);
+                                                ((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
                                             finish();
                                         }
                                         else {
                                             setResult(1, returnIntent);
+                                            Intent intent = getIntent();
+                                            Transaction oldTransaction = new Transaction();
+                                            String returnTitle = intent.getStringExtra("title");
+                                            String returnDate = intent.getStringExtra("date");
+                                            String returnAmount = intent.getStringExtra("amount");
+                                            String returnType = intent.getStringExtra("type");
+                                            String returnDescription = intent.getStringExtra("description");
+                                            String returnEndDate = intent.getStringExtra("endDate");
+                                            String returnInterval = intent.getStringExtra("interval");
+
+                                            oldTransaction.setTitle(returnTitle);
+                                            oldTransaction.setAmount(Double.valueOf(returnAmount));
+                                            oldTransaction.setItemDescription(returnDescription);
+                                            if(returnType.equals( "INDIVIDUALPAYMENT"))
+                                                oldTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+                                            else if(returnType.equals("REGULARPAYMENT"))
+                                                oldTransaction.setType(Transaction.Type.REGULARPAYMENT);
+                                            else if(returnType.equals("PURCHASE"))
+                                                oldTransaction.setType(Transaction.Type.PURCHASE);
+                                            else if(returnType.equals("REGULARINCOME"))
+                                                oldTransaction.setType(Transaction.Type.REGULARINCOME);
+                                            else if(returnType.equals("INDIVIDUALINCOME"))
+                                                oldTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+                                            try {
+                                                oldTransaction.setDate(sdf.parse(returnDate));
+                                                if(returnInterval.equals("0")) {
+                                                    oldTransaction.setEndDate(null);
+                                                }
+                                                else oldTransaction.setEndDate(sdf.parse(returnEndDate));
+                                                oldTransaction.setTransactionInterval(Integer.valueOf(returnInterval));
+
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
+                                            try {
+                                                presenter = new TransactionDetailPresenter(ctx);
+                                                ((TransactionDetailPresenter) presenter).saveTransaction(oldTransaction, newTransaction);
+                                            } catch (ParseException e) {
+                                                e.printStackTrace();
+                                            }
                                         }
                                         setResult(1, returnIntent);
                                         titleEditText.setBackgroundColor(Color.parseColor("#541068"));
@@ -404,6 +490,90 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         returnIntent.putExtra("returnDescription", descriptionEditText.getText().toString());
                         returnIntent.putExtra("returnEndDate", endDateEditText.getText().toString());
                         returnIntent.putExtra("returnInterval", intervalEditText.getText().toString());
+                        /////////////////////////////////////////////////////////////////////////////////////
+                        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+
+                        Transaction newTransaction = new Transaction();
+
+                        newTransaction.setTitle(titleEditText.getText().toString());
+                        newTransaction.setAmount(Double.valueOf(amountEditText.getText().toString()));
+                        newTransaction.setItemDescription(descriptionEditText.getText().toString());
+                        if(typeEditText.getText().toString().equals( "INDIVIDUALPAYMENT"))
+                            newTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+                        else if(typeEditText.getText().toString().equals("REGULARPAYMENT"))
+                            newTransaction.setType(Transaction.Type.REGULARPAYMENT);
+                        else if(typeEditText.getText().toString().equals("PURCHASE"))
+                            newTransaction.setType(Transaction.Type.PURCHASE);
+                        else if(typeEditText.getText().toString().equals("REGULARINCOME"))
+                            newTransaction.setType(Transaction.Type.REGULARINCOME);
+                        else if(typeEditText.getText().toString().equals("INDIVIDUALINCOME"))
+                            newTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+                        try {
+                            newTransaction.setDate(sdf.parse(dateEditText.getText().toString()));
+                            if(intervalEditText.getText().toString().equals("0")) {
+                                newTransaction.setEndDate(null);
+                            }
+                            else newTransaction.setEndDate(sdf.parse(endDateEditText.getText().toString()));
+                            newTransaction.setTransactionInterval(Integer.valueOf(intervalEditText.getText().toString()));
+
+                        } catch (ParseException e) {
+                            e.printStackTrace();
+                        }
+
+                        if(editOrAdd) {
+                            setResult(3, returnIntent);
+                            try {
+                                presenter = new TransactionDetailPresenter(ctx);
+                                ((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            finish();
+                        }
+                        else {
+                            setResult(1, returnIntent);
+                            Intent intent = getIntent();
+                            Transaction oldTransaction = new Transaction();
+                            String returnTitle = intent.getStringExtra("title");
+                            String returnDate = intent.getStringExtra("date");
+                            String returnAmount = intent.getStringExtra("amount");
+                            String returnType = intent.getStringExtra("type");
+                            String returnDescription = intent.getStringExtra("description");
+                            String returnEndDate = intent.getStringExtra("endDate");
+                            String returnInterval = intent.getStringExtra("interval");
+
+                            oldTransaction.setTitle(returnTitle);
+                            oldTransaction.setAmount(Double.valueOf(returnAmount));
+                            oldTransaction.setItemDescription(returnDescription);
+                            if(returnType.equals( "INDIVIDUALPAYMENT"))
+                                oldTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+                            else if(returnType.equals("REGULARPAYMENT"))
+                                oldTransaction.setType(Transaction.Type.REGULARPAYMENT);
+                            else if(returnType.equals("PURCHASE"))
+                                oldTransaction.setType(Transaction.Type.PURCHASE);
+                            else if(returnType.equals("REGULARINCOME"))
+                                oldTransaction.setType(Transaction.Type.REGULARINCOME);
+                            else if(returnType.equals("INDIVIDUALINCOME"))
+                                oldTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+                            try {
+                                oldTransaction.setDate(sdf.parse(returnDate));
+                                if(returnInterval.equals("0")) {
+                                    oldTransaction.setEndDate(null);
+                                }
+                                else oldTransaction.setEndDate(sdf.parse(returnEndDate));
+                                oldTransaction.setTransactionInterval(Integer.valueOf(returnInterval));
+
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            try {
+                                presenter = new TransactionDetailPresenter(ctx);
+                                ((TransactionDetailPresenter) presenter).saveTransaction(oldTransaction, newTransaction);
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                        }
                         setResult(1, returnIntent);
                         titleEditText.setBackgroundColor(Color.parseColor("#541068"));
                         dateEditText.setBackgroundColor(Color.parseColor("#541068"));
@@ -412,15 +582,10 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
                         endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
                         intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
-                        if(editOrAdd) {
-                            setResult(3, returnIntent);
-                            finish();
-                        }
-                        else {
-                            setResult(1, returnIntent);
-                        }
                     }
                 }
+                totalSpent = 0.0;
+                monthSpent = 0.0;
             }
         });
 
@@ -433,6 +598,51 @@ public class TransactionDetailActivity extends AppCompatActivity{
                         .setMessage("Are you sure you want to delete this transaction?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
+                                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                                Intent intent = getIntent();
+                                Transaction oldTransaction = new Transaction();
+                                String returnTitle = intent.getStringExtra("title");
+                                String returnDate = intent.getStringExtra("date");
+                                String returnAmount = intent.getStringExtra("amount");
+                                String returnType = intent.getStringExtra("type");
+                                String returnDescription = intent.getStringExtra("description");
+                                String returnEndDate = intent.getStringExtra("endDate");
+                                String returnInterval = intent.getStringExtra("interval");
+
+                                oldTransaction.setTitle(returnTitle);
+                                oldTransaction.setAmount(Double.valueOf(returnAmount));
+                                oldTransaction.setItemDescription(returnDescription);
+                                if(returnType.equals( "INDIVIDUALPAYMENT"))
+                                    oldTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+                                else if(returnType.equals("REGULARPAYMENT"))
+                                    oldTransaction.setType(Transaction.Type.REGULARPAYMENT);
+                                else if(returnType.equals("PURCHASE"))
+                                    oldTransaction.setType(Transaction.Type.PURCHASE);
+                                else if(returnType.equals("REGULARINCOME"))
+                                    oldTransaction.setType(Transaction.Type.REGULARINCOME);
+                                else if(returnType.equals("INDIVIDUALINCOME"))
+                                    oldTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+                                try {
+                                    oldTransaction.setDate(sdf.parse(returnDate));
+                                    if(returnInterval.equals("0")) {
+                                        oldTransaction.setEndDate(null);
+                                    }
+                                    else oldTransaction.setEndDate(sdf.parse(returnEndDate));
+                                    oldTransaction.setTransactionInterval(Integer.valueOf(returnInterval));
+
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                try {
+                                    presenter = new TransactionDetailPresenter(ctx);
+                                    ((TransactionDetailPresenter) presenter).deleteTransaction(oldTransaction);
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+
+                                for(Transaction t: presenter.getInteractor().getTransactions())
+                                    System.out.println(t.getTitle());
+                                
                                 Intent returnIntent = new Intent();
                                 setResult(2, returnIntent);
                                 finish();
@@ -444,5 +654,6 @@ public class TransactionDetailActivity extends AppCompatActivity{
             }
         });
     }
+
 
 }

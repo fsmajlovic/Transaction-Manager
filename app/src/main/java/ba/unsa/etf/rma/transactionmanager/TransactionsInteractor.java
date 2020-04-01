@@ -1,23 +1,31 @@
 package ba.unsa.etf.rma.transactionmanager;
 
-import java.text.ParseException;
+import java.util.ArrayList;
 
-public class TransactionsInteractor {
-    private userModel user;
-
-    public TransactionsInteractor(userModel user) {
-        this.user = user;
+public class TransactionsInteractor implements ITransactionInteractor{
+    @Override
+    public ArrayList<Transaction> getTransactions() {
+        return userModel.transactions;
     }
 
-    public TransactionsInteractor() throws ParseException {
-        user = new userModel();
+    @Override
+    public double getBudget() {
+        return userModel.account.getBudget();
     }
 
-    public userModel getUser() {
-        return user;
+    @Override
+    public double getTotalLimit() {
+        return userModel.account.getTotalLimit();
     }
 
-    public void setUser(userModel user) {
-        this.user = user;
+    @Override
+    public double getMonthLimit() {
+        return userModel.account.getMonthLimit();
     }
+
+    @Override
+    public Account getAccount() {
+        return userModel.account;
+    }
+
 }

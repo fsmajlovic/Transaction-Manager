@@ -10,18 +10,20 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class userModel {
-    private Account account;
-    private ArrayList<Transaction> transactions;
+    public static Account account = new Account(100000.0, 60000.0, 5000.0);
+    public static ArrayList<Transaction> transactions;
 
-    public userModel() throws ParseException {
-        //Adding some account data
-        account = new Account();
-        transactions = new ArrayList<Transaction>();
-        account.setBudget(100000.0);
-        account.setTotalLimit(60000.0);
-        account.setMonthLimit(5000.0);
+    static {
+        try {
+            transactions = fill();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 
-        //Adding some transactions
+
+    public static ArrayList<Transaction> fill() throws ParseException{
+        ArrayList<Transaction> transactions = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
         transactions.add( new Transaction(sdf.parse("16-01-2020"), 100,
@@ -29,7 +31,7 @@ public class userModel {
                 " bill for electricity expenses in January is $100. This amount goes to your power company. " +
                 "Total amount of $100 has been included in your Transaction Manager app.",
                 30, sdf.parse("15-02-2020")));
-        transactions.add( new Transaction(sdf.parse("17-02-2020"), 4125,
+        transactions.add( new Transaction(sdf.parse("17-03-2020"), 4125,
                 "Motorbike purchase", Transaction.Type.PURCHASE, "New Yamaha motorbike " +
                 "bought at Yamaha Sarajevo motorbike store. Black color with the maximum speed of 220 km/h." +
                 "Total amount of $4125 has been included in your Transaction Manager app.",
@@ -78,9 +80,6 @@ public class userModel {
                         "flying at 14 kph in windless conditions). You have to pay additional $40 for shipment. " +
                         "Total amount of $40 has been included in your Transaction Manager app.",
                 0,null));
-
-
-
         transactions.add( new Transaction(sdf.parse("22-03-2020"), 30,
                 "Water expenses", Transaction.Type.REGULARPAYMENT, "Standard monthly" +
                 " bill for water expenses in is $30. This amount goes to your water company. " +
@@ -109,7 +108,7 @@ public class userModel {
                 "Internet expenses", Transaction.Type.REGULARPAYMENT,
                 "Bill for internet expenses in March is $40. This amount goes to BHTelecom internet provider. " +
                         "Total amount of $40 has been included in your Transaction Manager app.",
-                365, sdf.parse("14-04-2021")));
+                30, sdf.parse("14-04-2021")));
         transactions.add( new Transaction(sdf.parse("01-01-2020"), 140,
                 "RHCP tickets", Transaction.Type.PURCHASE, "Two tickets for the Red Hot Chili Peppers " +
                 "performance in Firenze. Date: June, 13th. Total amount of $140 has been included in your Transaction Manager app.",
@@ -128,9 +127,7 @@ public class userModel {
                 " Color Sunburst with a Marshal studio amp. Total amount of $1200 has been included in your Transaction Manager app.",
                 0, null));
 
-
-
-
+        return transactions;
     }
 
     public userModel(Account account, ArrayList<Transaction> transactions) {

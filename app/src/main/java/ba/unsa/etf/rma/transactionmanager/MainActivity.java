@@ -4,7 +4,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.graphics.Movie;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -16,14 +15,12 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 
-import ba.unsa.etf.rma.transactionmanager.Activities.TransactionDetailActivity;
 import ba.unsa.etf.rma.transactionmanager.Adapters.FilterBySpinnerAdapter;
 import ba.unsa.etf.rma.transactionmanager.Adapters.SortBySpinnerAdapter;
 import ba.unsa.etf.rma.transactionmanager.Adapters.TransactionsListViewAdapter;
@@ -44,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> entries;
     private ListView listView;
     private ArrayList<Transaction> transactions;
-    private userModel user;
+    private ArrayList<Transaction> userTransactions;
     private TransactionsListViewAdapter listViewAdapter;
     private ArrayList<Transaction> filteredTransactions;
     private TextView globalAmountTextView;
@@ -53,8 +50,7 @@ public class MainActivity extends AppCompatActivity {
     private Transaction selectedTransaction;
     private TextView addTransactionTextView;
     private double budget;
-    private double spentTotal = 0.0;
-    private double spentMonth = 0.0;
+    private double limit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,15 +77,17 @@ public class MainActivity extends AppCompatActivity {
         //TransactionsPresenter regulations
         try {
             TransactionsPresenter presenter = new TransactionsPresenter();
-            transactions = presenter.getInteractor().getUser().getTransactions();
-            filteredTransactions = presenter.getInteractor().getUser().getTransactions();
-            user = presenter.getInteractor().getUser();
+            transactions = presenter.getInteractor().getTransactions();
+            filteredTransactions = presenter.getInteractor().getTransactions();
+            userTransactions = presenter.getInteractor().getTransactions();
+            budget = presenter.getInteractor().getBudget();
+            limit = presenter.getInteractor().getTotalLimit();
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        budget = user.getAccount().getBudget();
+
         globalAmountTextView.setText("Global amount: $" + budget);
-        limitTextView.setText("Limit:" + user.getAccount().getTotalLimit() + "$");
+        limitTextView.setText("Limit: $" + limit);
 
 
 
@@ -132,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 int position = filterSpinner.getSelectedItemPosition();
                 if(position >= 0 && position <= textArray.length) {
-                    getSelectedCategoryData(textArray[position], user.getTransactions(), calendarPass);
+                    getSelectedCategoryData(textArray[position], userTransactions, calendarPass);
                 }
             }
 
@@ -162,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 int position = filterSpinner.getSelectedItemPosition();
                 if(position >= 0 && position <= textArray.length) {
-                    getSelectedCategoryData(textArray[position], user.getTransactions(), calendarPass);
+                    getSelectedCategoryData(textArray[position], userTransactions, calendarPass);
                 }
             }
 
@@ -193,7 +191,7 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
                 if(position >= 0 && position <= textArray.length) {
-                    getSelectedCategoryData(textArray[position], user.getTransactions(), calendar);
+                    getSelectedCategoryData(textArray[position], userTransactions, calendar);
                 }
             }
 
@@ -203,10 +201,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
-        //Limit regulations
-        calculateMonthSpent();
-        calculateTotalSpent();
 
 
         //ListView regulations
@@ -224,10 +218,6 @@ public class MainActivity extends AppCompatActivity {
                 else
                     endDate = "This type has no end date.";
                 Intent intentListItem = new Intent(getApplicationContext(), TransactionDetailActivity.class);
-                calculateMonthSpent();
-                calculateMonthSpent();
-                intentListItem.putExtra("monthSpent", spentMonth);
-                intentListItem.putExtra("totalSpent", spentTotal);
                 intentListItem.putExtra("title", selectedTransaction.getTitle());
                 intentListItem.putExtra("date", startDate);
                 intentListItem.putExtra("amount", String.valueOf(selectedTransaction.getAmount()));
@@ -247,10 +237,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intentAddTransaction = new Intent(getApplicationContext(), TransactionDetailActivity.class);
-                calculateMonthSpent();
-                calculateMonthSpent();
-                intentAddTransaction.putExtra("monthSpent", spentMonth);
-                intentAddTransaction.putExtra("totalSpent", spentTotal);
                 intentAddTransaction.putExtra("title", "");
                 intentAddTransaction.putExtra("date", "");
                 intentAddTransaction.putExtra("amount", "");
@@ -263,9 +249,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intentAddTransaction, 0);
             }
         });
-
-
-
     }
 
     private void getSelectedCategoryData(String s, ArrayList<Transaction> transactions, Calendar calendar) {
@@ -345,6 +328,11 @@ public class MainActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
+            Calendar tDate = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+            String dateString = sdf.format(currentItem.getDate().getTime());
+            if(!dateString.equals(monthTextView.getText().toString()))
+                filteredTransactions.remove(selectedPosition);
         }
         else if(resultCode == 2){
             filteredTransactions.remove(selectedTransaction);
@@ -385,47 +373,30 @@ public class MainActivity extends AppCompatActivity {
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-            filteredTransactions.add(addTransaction);
-            transactions.add(addTransaction);
-            listViewAdapter.notifyDataSetChanged();
+
+
+            Calendar tDate = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+            String dateString = sdf.format(addTransaction.getDate().getTime());
+            if(dateString.equals(monthTextView.getText().toString()))
+                filteredTransactions.add(addTransaction);
+//            transactions.add(addTransaction);
+
 
             //Updating budget
             if (returnType.contains("PAYMENT") || returnType.contains("PURCHASE")) {
                 double newBudget = budget - Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
-                spentTotal += Double.valueOf(returnAmount);
-                spentMonth += Double.valueOf(returnAmount);
             }
             else if (returnType.contains("INCOME")) {
                 double newBudget = budget + Double.valueOf(returnAmount);
                 globalAmountTextView.setText("Global amount: $" + newBudget);
-                spentTotal -= Double.valueOf(returnAmount);
-                spentMonth -= Double.valueOf(returnAmount);
-                if(spentTotal < 0)
-                    spentTotal = 0;
-                if(spentMonth < 0)
-                    spentMonth = 0;
             }
-
         }
+        listViewAdapter.notifyDataSetChanged();
         listView.invalidateViews();
 
+
     }
 
-    public void calculateMonthSpent(){
-        spentMonth = 0.0;
-        for(Transaction t: filteredTransactions){
-            if(t.getType().equals(Transaction.Type.PURCHASE) || t.getType().equals(Transaction.Type.INDIVIDUALPAYMENT) ||
-                    t.getType().equals(Transaction.Type.REGULARPAYMENT))
-                spentMonth = spentMonth + t.getAmount();
-        }
-    }
-
-    public void calculateTotalSpent(){
-        for(Transaction t: transactions){
-            if(t.getType().equals(Transaction.Type.PURCHASE) || t.getType().equals(Transaction.Type.INDIVIDUALPAYMENT) ||
-                    t.getType().equals(Transaction.Type.REGULARPAYMENT))
-                spentTotal = spentTotal + t.getAmount();
-        }
-    }
 }
