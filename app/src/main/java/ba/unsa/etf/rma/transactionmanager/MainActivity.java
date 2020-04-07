@@ -33,6 +33,7 @@ import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorDescending;
 
 
 public class MainActivity extends AppCompatActivity {
+    //Test
     private Spinner filterSpinner;
     private TextView monthTextView;
     private ImageView arrowBackImageView;
