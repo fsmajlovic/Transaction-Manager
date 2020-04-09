@@ -11,6 +11,8 @@
     <color name="deleteBtnColor">#B41D1D</color>
     <color name="shadow">#000000</color>
     <color name="customStyleColor">#541068</color>
+    <color name="selctedItem">#B8A228</color>
+
 
 
 </resources>

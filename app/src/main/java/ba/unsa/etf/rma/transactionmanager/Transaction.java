@@ -1,8 +1,11 @@
 package ba.unsa.etf.rma.transactionmanager;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.util.Date;
 
-public class Transaction {
+public class Transaction implements Parcelable {
     public enum Type {
         INDIVIDUALPAYMENT,
         REGULARPAYMENT,
@@ -18,6 +21,39 @@ public class Transaction {
     private String itemDescription;
     private int transactionInterval;
     private Date endDate;
+
+
+    protected Transaction(Parcel in) {
+        amount = in.readDouble();
+        title = in.readString();
+        itemDescription = in.readString();
+        transactionInterval = in.readInt();
+    }
+
+    public static final Creator<Transaction> CREATOR = new Creator<Transaction>() {
+        @Override
+        public Transaction createFromParcel(Parcel in) {
+            return new Transaction(in);
+        }
+
+        @Override
+        public Transaction[] newArray(int size) {
+            return new Transaction[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int flags) {
+        parcel.writeDouble(amount);
+        parcel.writeString(title);
+        parcel.writeString(itemDescription);
+        parcel.writeInt(transactionInterval);
+    }
 
     public Transaction() {
     }
