@@ -55,7 +55,6 @@ public class TransactionListFragment extends Fragment {
     private ImageView arrowBackImageView;
     private ImageView arrowForwardImageView;
     private Spinner sortBySpinner;
-    private ArrayList<String> entries;
     private ListView listView;
     private ArrayList<Transaction> transactions;
     private ArrayList<Transaction> userTransactions;
@@ -66,15 +65,10 @@ public class TransactionListFragment extends Fragment {
     private TextView addTransactionTextView;
     private double budget;
     private double limit;
-    private boolean twoPaneMode=false;
     private OnItemClick oic;
     private OnAddItem oai;
     private OnAddTextViewClick oatvc;
     int itemPosition, counter;
-    private View checkedItemView;
-
-
-    private int listItemPosition;
 
     public interface OnItemClick {
         void onItemClicked(Transaction transaction, boolean eOa);
@@ -149,6 +143,7 @@ public class TransactionListFragment extends Fragment {
                     "Treba implementirati OnAddTextViewClicked");
         }
 
+        //Setting up landscape details fragment for just updating
         setupForAddItem();
 
         globalAmountTextView.setText("Global amount: $" + budget);
@@ -345,8 +340,6 @@ public class TransactionListFragment extends Fragment {
                 e.printStackTrace();
             }
 
-            System.out.println(t.getTitle() + " " +  dateString +  " " + t.getType().toString());
-
             if (s == "All" && tDate.compareTo(calendar) == 0) {
                 filteredTransactions.add(t);
             }
@@ -368,11 +361,6 @@ public class TransactionListFragment extends Fragment {
             Collections.sort(filteredTransactions, new DateComparatorAscending());
         else if(selectedSort.equals("Date - Descending"))
             Collections.sort(filteredTransactions, new DateComparatorDescending());
-
-
-        System.out.println("\n\n\n\nList of filtered transactions:  ");
-        for(Transaction t: transactions)
-            System.out.println(t.getTitle());
 
         listViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout.list_item, filteredTransactions);
         listView.setAdapter(listViewAdapter);
