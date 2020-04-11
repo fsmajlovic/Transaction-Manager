@@ -9,5 +9,8 @@ public interface ITransactionInteractor {
     double getBudget();
     double getTotalLimit();
     double getMonthLimit();
+    void setBudget(double budget);
+    void setMonthLimit(double monthLimit);
+    void setTotalLimit(double totalLimit);
     Account getAccount();
 }

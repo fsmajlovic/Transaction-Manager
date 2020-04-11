@@ -24,6 +24,21 @@ public class TransactionsInteractor implements ITransactionInteractor{
     }
 
     @Override
+    public void setBudget(double budget) {
+        userModel.account.setBudget(budget);
+    }
+
+    @Override
+    public void setMonthLimit(double monthLimit) {
+        userModel.account.setMonthLimit(monthLimit);
+    }
+
+    @Override
+    public void setTotalLimit(double totalLimit) {
+        userModel.account.setTotalLimit(totalLimit);
+    }
+
+    @Override
     public Account getAccount() {
         return userModel.account;
     }
