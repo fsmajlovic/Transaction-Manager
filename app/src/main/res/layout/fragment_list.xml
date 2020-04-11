@@ -7,6 +7,7 @@
     tools:context=".MainActivity"
     android:background="@color/ghostWhite">
 
+
     <TextView
         android:id="@+id/globalAmountTextView"
         android:layout_width="wrap_content"
@@ -135,4 +136,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sortBySpinner"
         android:id="@+id/listView" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

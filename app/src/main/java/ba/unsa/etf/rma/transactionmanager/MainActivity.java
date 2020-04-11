@@ -3,39 +3,16 @@ package ba.unsa.etf.rma.transactionmanager;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.viewpager.widget.ViewPager;
 
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Spinner;
-import android.widget.TextView;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-
-import ba.unsa.etf.rma.transactionmanager.Adapters.FilterBySpinnerAdapter;
-import ba.unsa.etf.rma.transactionmanager.Adapters.SortBySpinnerAdapter;
-import ba.unsa.etf.rma.transactionmanager.Adapters.TransactionsListViewAdapter;
-import ba.unsa.etf.rma.transactionmanager.Comparators.DateComparatorAscending;
-import ba.unsa.etf.rma.transactionmanager.Comparators.DateComparatorDescending;
-import ba.unsa.etf.rma.transactionmanager.Comparators.PriceComparatorAscending;
-import ba.unsa.etf.rma.transactionmanager.Comparators.PriceComparatorDescending;
-import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorAscending;
-import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorDescending;
 
 
-public class MainActivity extends AppCompatActivity implements TransactionListFragment.OnItemClick,
+
+public class MainActivity extends FragmentActivity implements TransactionListFragment.OnItemClick,
         TransactionDetailFragment.OnDelete, TransactionDetailFragment.OnRefresh, TransactionListFragment.OnAddItem,
         TransactionListFragment.OnAddTextViewClick {
 
@@ -46,18 +23,24 @@ public class MainActivity extends AppCompatActivity implements TransactionListFr
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        viewPager = findViewById(R.id.viewPager);
+//        swipeAdapter = new SwipeAdapter(getSupportFragmentManager(), 1);
+//        viewPager.setAdapter(swipeAdapter);
+//        viewPager.setCurrentItem(1);
 
-        //dohvatanje FragmentManager-a
+
+
+//        //dohvatanje FragmentManager-a
         FragmentManager fragmentManager = getSupportFragmentManager();
         FrameLayout details = findViewById(R.id.transaction_detail);
-//slucaj layouta za ˇsiroke ekrane
+////slucaj layouta za ˇsiroke ekrane
         if (details != null) {
             twoPaneMode = true;
             TransactionDetailFragment detailFragment = (TransactionDetailFragment)
                     fragmentManager.findFragmentById(R.id.transaction_detail);
-//provjerimo da li je fragment detalji ve´c kreiran
+////provjerimo da li je fragment detalji ve´c kreiran
             if (detailFragment==null) {
-//kreiramo novi fragment FragmentDetalji ukoliko ve´c nije kreiran
+////kreiramo novi fragment FragmentDetalji ukoliko ve´c nije kreiran
                 detailFragment = new TransactionDetailFragment();
                 fragmentManager.beginTransaction().
                         replace(R.id.transaction_detail,detailFragment)
@@ -65,26 +48,28 @@ public class MainActivity extends AppCompatActivity implements TransactionListFr
             }
         } else {
             twoPaneMode = false;
+
         }
-//Dodjeljivanje fragmenta MovieListFragment
+////Dodjeljivanje fragmenta MovieListFragment
         Fragment listFragment =
                 fragmentManager.findFragmentByTag("list");
-//provjerimo da li je ve´c kreiran navedeni fragment
+////provjerimo da li je ve´c kreiran navedeni fragment
         if (listFragment==null){
-//ukoliko nije, kreiramo
-            listFragment = new TransactionListFragment();
+////ukoliko nije, kreiramo
+            listFragment = new HomeFragment();
             fragmentManager.beginTransaction()
                     .replace(R.id.transactions_list,listFragment,"list")
                     .commit();
         }else{
-//sluˇcaj kada mijenjamo orijentaciju uredaja
-//iz portrait (uspravna) u landscape (vodoravna)
-//a u aktivnosti je bio otvoren fragment MovieDetailFragment
-//tada je potrebno skinuti MovieDetailFragment sa steka
-//kako ne bi bio dodan na mjesto fragmenta MovieListFragment
+////sluˇcaj kada mijenjamo orijentaciju uredaja
+////iz portrait (uspravna) u landscape (vodoravna)
+////a u aktivnosti je bio otvoren fragment MovieDetailFragment
+////tada je potrebno skinuti MovieDetailFragment sa steka
+////kako ne bi bio dodan na mjesto fragmenta MovieListFragment
             fragmentManager.popBackStack(null,
                     FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
+
 
     }
 
@@ -106,12 +91,13 @@ public class MainActivity extends AppCompatActivity implements TransactionListFr
                     .replace(R.id.transactions_list,detailFragment)
                     .addToBackStack(null).commit();
         }
+
     }
 
     @Override
     public void onItemDeleted(Transaction transaction) {
 
-        TransactionListFragment listFragment = new TransactionListFragment();
+        HomeFragment listFragment = new HomeFragment();
         if (twoPaneMode){
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.transactions_list, listFragment)
@@ -128,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements TransactionListFr
     @Override
     public void refreshFragment() {
 
-        TransactionListFragment listFragment = new TransactionListFragment();
+        HomeFragment listFragment = new HomeFragment();
         if (twoPaneMode){
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.transactions_list, listFragment)

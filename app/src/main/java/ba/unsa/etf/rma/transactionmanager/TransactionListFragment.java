@@ -1,6 +1,7 @@
 package ba.unsa.etf.rma.transactionmanager;
 
 import androidx.annotation.ColorRes;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -39,6 +40,7 @@ import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorAscending;
 import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorDescending;
 
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -92,6 +94,7 @@ public class TransactionListFragment extends Fragment {
             Bundle savedInstanceState) {
 
 
+
         View fragmentView = inflater.inflate(R.layout.fragment_list, container, false);
         filterSpinner = (Spinner) fragmentView.findViewById(R.id.filterSpinner);
         sortBySpinner = (Spinner) fragmentView.findViewById(R.id.sortBySpinner);
@@ -108,7 +111,8 @@ public class TransactionListFragment extends Fragment {
                 "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
                 "Date - Ascending", "Date - Descending"
         };
-
+        arrowBackImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_backward));
+        arrowForwardImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_forward));
 
 
         //TransactionsPresenter regulations
@@ -286,9 +290,9 @@ public class TransactionListFragment extends Fragment {
             }
         });
 
-
         return fragmentView;
     }
+
 
 
 

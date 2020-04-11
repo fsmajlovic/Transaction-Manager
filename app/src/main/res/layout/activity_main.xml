@@ -9,6 +9,13 @@
         android:id="@+id/transactions_list"
         android:layout_weight="1">
     </ScrollView>
+
+    <!--<androidx.viewpager.widget.ViewPager-->
+        <!--android:id="@+id/viewPager"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_weight="1"-->
+        <!--&gt;</androidx.viewpager.widget.ViewPager>-->
 </LinearLayout>
 
 
