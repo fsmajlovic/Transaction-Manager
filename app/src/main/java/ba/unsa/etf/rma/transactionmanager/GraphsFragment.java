@@ -101,42 +101,62 @@ public class GraphsFragment extends Fragment {
                 period = cal.get(Calendar.DAY_OF_YEAR);
             }
 
-            //Getting end date from transaction
-            int endPeriod = 0;
-            if(t.getEndDate() != null){
-                java.util.Date endDate = t.getEndDate();
-                cal.setTime(endDate);
-                endPeriod = cal.get(Calendar.MONTH);
-                if(periodTextView.getText().toString().equals("Monthly")) {
-                    endPeriod = cal.get(Calendar.MONTH);
-                }
-                else if(periodTextView.getText().toString().equals("Weekly")) {
-                    endPeriod = cal.get(Calendar.WEEK_OF_YEAR);
-                }
-                else if(periodTextView.getText().toString().equals("Daily")) {
-                    endPeriod = cal.get(Calendar.DAY_OF_YEAR);
-                }
-            }
-
             if(cal.get(Calendar.YEAR) == 2020) {
                 //Payments
-                if (t.getType().equals(Transaction.Type.PURCHASE) || t.getType().equals(Transaction.Type.INDIVIDUALPAYMENT) ||
-                        t.getType().equals(Transaction.Type.REGULARPAYMENT)) {
+                if (t.getType().equals(Transaction.Type.PURCHASE)
+                        || t.getType().equals(Transaction.Type.INDIVIDUALPAYMENT)) {
                     money_spent_sums_array[period] += t.getAmount();
                     money_total_sums_array[period] -= t.getAmount();
-                    if (t.getType().equals(Transaction.Type.REGULARPAYMENT)) {
-                        money_spent_sums_array[endPeriod] += t.getAmount();
-                        money_total_sums_array[endPeriod] -= t.getAmount();
+                }
+                else if (t.getType().equals(Transaction.Type.REGULARPAYMENT)) {
+                    Date startDate = t.getDate();
+                    Date endDate = t.getEndDate();
+                    while(startDate.compareTo(endDate) < 0){
+                        int interval = t.getTransactionInterval();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(startDate);
+                        int regularPeriod = 0;
+                        if(periodTextView.getText().toString().equals("Monthly")) {
+                            regularPeriod = c.get(Calendar.MONTH);
+                        }
+                        else if(periodTextView.getText().toString().equals("Weekly")) {
+                            regularPeriod = c.get(Calendar.WEEK_OF_YEAR);
+                        }
+                        else if(periodTextView.getText().toString().equals("Daily")) {
+                            regularPeriod = c.get(Calendar.DAY_OF_YEAR);
+                        }
+                        money_spent_sums_array[regularPeriod] += t.getAmount();
+                        money_total_sums_array[regularPeriod] -= t.getAmount();
+                        c.add(Calendar.DATE, interval);
+                        startDate = c.getTime();
                     }
                 }
                 //Income
-                else if (t.getType().equals(Transaction.Type.INDIVIDUALINCOME)
-                        || t.getType().equals(Transaction.Type.REGULARINCOME)) {
+                else if (t.getType().equals(Transaction.Type.INDIVIDUALINCOME)) {
                     money_earned_sums_array[period] += t.getAmount();
                     money_total_sums_array[period] += t.getAmount();
-                    if (t.getType().equals(Transaction.Type.REGULARINCOME)) {
-                        money_earned_sums_array[endPeriod] += t.getAmount();
-                        money_total_sums_array[endPeriod] += t.getAmount();
+                }
+                else if (t.getType().equals(Transaction.Type.REGULARINCOME)) {
+                    Date startDate = t.getDate();
+                    Date endDate = t.getEndDate();
+                    while(startDate.compareTo(endDate) < 0){
+                        int interval = t.getTransactionInterval();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(startDate);
+                        int regularPeriod = 0;
+                        if(periodTextView.getText().toString().equals("Monthly")) {
+                            regularPeriod = c.get(Calendar.MONTH);
+                        }
+                        else if(periodTextView.getText().toString().equals("Weekly")) {
+                            regularPeriod = c.get(Calendar.WEEK_OF_YEAR);
+                        }
+                        else if(periodTextView.getText().toString().equals("Daily")) {
+                            regularPeriod = c.get(Calendar.DAY_OF_YEAR);
+                        }
+                        money_earned_sums_array[regularPeriod] += t.getAmount();
+                        money_total_sums_array[regularPeriod] += t.getAmount();
+                        c.add(Calendar.DATE, interval);
+                        startDate = c.getTime();
                     }
                 }
             }

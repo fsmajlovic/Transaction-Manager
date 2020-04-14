@@ -26,7 +26,7 @@ public class userModel {
         ArrayList<Transaction> transactions = new ArrayList<>();
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 
-        transactions.add( new Transaction(sdf.parse("16-01-2020"), 100,
+        transactions.add( new Transaction(sdf.parse("16-06-2020"), 100,
                 "Electricity expenses", Transaction.Type.REGULARPAYMENT, "Standard monthly" +
                 " bill for electricity expenses in January is $100. This amount goes to your power company. " +
                 "Total amount of $100 has been included in your Transaction Manager app.",
@@ -36,17 +36,17 @@ public class userModel {
                 "bought at Yamaha Sarajevo motorbike store. Black color with the maximum speed of 220 km/h." +
                 "Total amount of $4125 has been included in your Transaction Manager app.",
                 0, null));
-        transactions.add( new Transaction(sdf.parse("10-02-2020"), 3500,
+        transactions.add( new Transaction(sdf.parse("10-02-2020"), 2500,
                 "February Salary", Transaction.Type.REGULARINCOME, "Monthly salary income " +
                 "from AppDev CO. Total amount of $3500 has been included in your Transaction Manager app. ",
-                30, sdf.parse("09-03-2020")));
+                30, sdf.parse("10-03-2020")));
         transactions.add( new Transaction(sdf.parse("15-03-2020"), 600,
                 "Freelancer project", Transaction.Type.INDIVIDUALINCOME,
                 "Paycheck for finishing several tasks for your Freelancer client: App " +
                         "development, SQL database established, MD5 Hashing added to profile passwords. " +
                         "Total amount of $600 has been included in your Transaction Manager app.",
                 0,null));
-        transactions.add( new Transaction(sdf.parse("18-03-2020"), 500,
+        transactions.add( new Transaction(sdf.parse("18-05-2020"), 500,
                 "Speeding ticket", Transaction.Type.INDIVIDUALPAYMENT,
                 "Camera caught you violating the speed limit law. You have been speeding " +
                         "with the speed of 100 km/h in the 70 km/h area. Destination: \"Zmaja od Bosne, Sarajevo\" " +
@@ -63,7 +63,7 @@ public class userModel {
                 "monitor purchase. ASUS ROG Swift PG348Q 34\" Curved Ultra-wide G-SYNC Gaming Monitor " +
                 "Total amount of 700 has been included in your Transaction Manager app.",
                 0, null));
-        transactions.add( new Transaction(sdf.parse("10-03-2020"), 3500,
+        transactions.add( new Transaction(sdf.parse("10-03-2020"), 2500,
                 "March Salary", Transaction.Type.REGULARINCOME, "Monthly salary income " +
                 "from AppDev CO. Total amount of $3500 has been included in your Transaction Manager app. ",
                 30, sdf.parse("09-04-2020")));
@@ -90,30 +90,30 @@ public class userModel {
                 "bought at Target Sarajevo videogame store. Specs: CPU : x86-64 AMD “Jaguar”, 8 cores, " +
                 "Storage size: 500GB, 1TB. Total amount of $650 has been included in your Transaction Manager app.",
                 0, null));
-        transactions.add( new Transaction(sdf.parse("10-01-2020"), 3500,
+        transactions.add( new Transaction(sdf.parse("10-01-2020"), 2500,
                 "January Salary", Transaction.Type.REGULARINCOME, "Monthly salary income " +
                 "from AppDev CO. Total amount of $3500 has been included in your Transaction Manager app. ",
                 30, sdf.parse("09-02-2020")));
-        transactions.add( new Transaction(sdf.parse("11-01-2020"), 200,
+        transactions.add( new Transaction(sdf.parse("11-05-2020"), 200,
                 "Youtube income", Transaction.Type.INDIVIDUALINCOME,
                 "Paycheck from youtube for your \"Visual Studio Tutorials\" profile." +
                         " Total amount of $200 has been included in your Transaction Manager app.",
                 0,null));
-        transactions.add( new Transaction(sdf.parse("01-01-2020"), 360,
+        transactions.add( new Transaction(sdf.parse("01-06-2020"), 360,
                 "Boarding ticket", Transaction.Type.INDIVIDUALPAYMENT,
                 "Boarding ticket Sarajevo(SJJ) - Florenta(FLR) booked for 05.06.2020 date and " +
-                        "return date 15.06.2020. Total amount of @360 has been included in your Transaction Manager app.",
+                        "return date 15.06.2020. Total amount of $360 has been included in your Transaction Manager app.",
                 0,null));
-        transactions.add( new Transaction(sdf.parse("15-03-2020"), 40,
+        transactions.add( new Transaction(sdf.parse("15-05-2020"), 40,
                 "Internet expenses", Transaction.Type.REGULARPAYMENT,
                 "Bill for internet expenses in March is $40. This amount goes to BHTelecom internet provider. " +
                         "Total amount of $40 has been included in your Transaction Manager app.",
-                30, sdf.parse("14-04-2021")));
-        transactions.add( new Transaction(sdf.parse("01-01-2020"), 140,
+                30, sdf.parse("27-07-2020")));
+        transactions.add( new Transaction(sdf.parse("01-05-2020"), 140,
                 "RHCP tickets", Transaction.Type.PURCHASE, "Two tickets for the Red Hot Chili Peppers " +
                 "performance in Firenze. Date: June, 13th. Total amount of $140 has been included in your Transaction Manager app.",
                 0, null));
-        transactions.add( new Transaction(sdf.parse("10-04-2020"), 3500,
+        transactions.add( new Transaction(sdf.parse("10-04-2020"), 2500,
                 "April Salary", Transaction.Type.REGULARINCOME, "Monthly salary income " +
                 "from AppDev CO. Total amount of $3500 has been included in your Transaction Manager app.",
                 30, sdf.parse("09-05-2020")));
@@ -126,6 +126,42 @@ public class userModel {
                 "Fender Stratocaster", Transaction.Type.PURCHASE, "New Fender Custom 57 Stratocaster 3" +
                 " Color Sunburst with a Marshal studio amp. Total amount of $1200 has been included in your Transaction Manager app.",
                 0, null));
+
+        transactions.add( new Transaction(sdf.parse("02-06-2020"), 300,
+                "Regular P 1", Transaction.Type.REGULARPAYMENT, "Regular payment 1",
+                20, sdf.parse("22-10-2020")));
+
+        transactions.add( new Transaction(sdf.parse("22-04-2020"), 1110,
+                "Bonus Salary 1", Transaction.Type.REGULARINCOME, "This is your Freelancer Bonus Salary that you receive" +
+                "for every month from April to July throughout the year.",
+                30, sdf.parse("22-07-2020")));
+
+        transactions.add( new Transaction(sdf.parse("22-07-2020"), 600,
+                "Producer Income", Transaction.Type.REGULARINCOME, "This is your Producer income that you will receive" +
+                "for every month from July to December throughout the year.",
+                30, sdf.parse("22-12-2020")));
+
+        transactions.add( new Transaction(sdf.parse("22-10-2020"), 550,
+                "Bonus Income", Transaction.Type.REGULARINCOME, "This is your Bonus income that you will receive" +
+                "for every month from October to December throughout the year.",
+                30, sdf.parse("31-12-2020")));
+
+        transactions.add( new Transaction(sdf.parse("02-01-2020"), 370,
+                "Monthly Salary Bonus", Transaction.Type.REGULARINCOME, "Every month throughout the year you receive this bonus",
+                30, sdf.parse("31-12-2020")));
+
+        transactions.add( new Transaction(sdf.parse("03-01-2020"), 550,
+                "Yearly Expenses 1", Transaction.Type.REGULARPAYMENT, "Every month throughout the year you pay this expenses",
+                30, sdf.parse("30-12-2020")));
+
+        transactions.add( new Transaction(sdf.parse("03-01-2020"), 550,
+                "Yearly Expenses 2", Transaction.Type.REGULARPAYMENT, "Additional yearly expenses. You pay this amount every month.",
+                30, sdf.parse("30-12-2020")));
+
+        transactions.add( new Transaction(sdf.parse("01-01-2020"), 10,
+                "Daily donations", Transaction.Type.REGULARINCOME, "Daily donations from adds you have implemented on various websites.",
+                1, sdf.parse("30-12-2020")));
+
 
         return transactions;
     }
