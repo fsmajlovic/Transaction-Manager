@@ -94,7 +94,7 @@ public class userModel {
                 "January Salary", Transaction.Type.REGULARINCOME, "Monthly salary income " +
                 "from AppDev CO. Total amount of $3500 has been included in your Transaction Manager app. ",
                 30, sdf.parse("09-02-2020")));
-        transactions.add( new Transaction(sdf.parse("11-05-2020"), 200,
+        transactions.add( new Transaction(sdf.parse("11-03-2020"), 200,
                 "Youtube income", Transaction.Type.INDIVIDUALINCOME,
                 "Paycheck from youtube for your \"Visual Studio Tutorials\" profile." +
                         " Total amount of $200 has been included in your Transaction Manager app.",
@@ -104,7 +104,7 @@ public class userModel {
                 "Boarding ticket Sarajevo(SJJ) - Florenta(FLR) booked for 05.06.2020 date and " +
                         "return date 15.06.2020. Total amount of $360 has been included in your Transaction Manager app.",
                 0,null));
-        transactions.add( new Transaction(sdf.parse("15-05-2020"), 40,
+        transactions.add( new Transaction(sdf.parse("15-03-2020"), 40,
                 "Internet expenses", Transaction.Type.REGULARPAYMENT,
                 "Bill for internet expenses is $40. This amount goes to BHTelecom internet provider. " +
                         "Total amount of $40 has been included in your Transaction Manager app.",

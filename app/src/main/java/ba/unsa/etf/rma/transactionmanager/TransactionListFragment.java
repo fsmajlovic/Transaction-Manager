@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -20,6 +21,7 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -95,7 +97,7 @@ public class TransactionListFragment extends Fragment {
 
 
 
-        View fragmentView = inflater.inflate(R.layout.fragment_list, container, false);
+        final View fragmentView = inflater.inflate(R.layout.fragment_list, container, false);
         filterSpinner = (Spinner) fragmentView.findViewById(R.id.filterSpinner);
         sortBySpinner = (Spinner) fragmentView.findViewById(R.id.sortBySpinner);
         monthTextView = (TextView) fragmentView.findViewById(R.id.monthTextView);
@@ -287,6 +289,21 @@ public class TransactionListFragment extends Fragment {
 
         listView.setOnItemClickListener(listItemClickListener);
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+        //Setting up so that scrolling list in scrollView is scrollable
+        listView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                ScrollView mScrollView = fragmentView.findViewById(R.id.scrollViewList);
+                mScrollView.requestDisallowInterceptTouchEvent(true);
+                int action = motionEvent.getActionMasked();
+                switch (action){
+                    case MotionEvent.ACTION_UP:
+                        mScrollView.requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+                return false;
+            }
+        });
 
         //Add Transaction TextView
         addTransactionTextView.setOnClickListener(new View.OnClickListener() {
@@ -295,6 +312,8 @@ public class TransactionListFragment extends Fragment {
                 oatvc.onAddClicked(true);
             }
         });
+
+
 
         return fragmentView;
     }
