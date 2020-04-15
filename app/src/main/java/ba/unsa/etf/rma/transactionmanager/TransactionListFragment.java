@@ -121,7 +121,7 @@ public class TransactionListFragment extends Fragment {
             transactions = presenter.getInteractor().getTransactions();
             filteredTransactions = presenter.getInteractor().getTransactions();
             userTransactions = presenter.getInteractor().getTransactions();
-            budget = presenter.getInteractor().getBudget();
+            budget = presenter.calculateGlobalAmount();
             limit = presenter.getInteractor().getTotalLimit();
 
         } catch (ParseException e) {
@@ -166,6 +166,9 @@ public class TransactionListFragment extends Fragment {
             public void onClick(View view) {
                 currentMonth.add(Calendar.MONTH, -1);
                 monthTextView.setText(dateFormat.format(currentMonth.getTime()));
+                counter = 0;
+                itemPosition = -1;
+                setupForAddItem();
             }
         });
 
@@ -174,6 +177,9 @@ public class TransactionListFragment extends Fragment {
             public void onClick(View view) {
                 currentMonth.add(Calendar.MONTH, +1);
                 monthTextView.setText(dateFormat.format(currentMonth.getTime()));
+                counter = 0;
+                itemPosition = -1;
+                setupForAddItem();
             }
         });
 
@@ -382,7 +388,7 @@ public class TransactionListFragment extends Fragment {
         TransactionsPresenter presenter = null;
         try {
             presenter = new TransactionsPresenter();
-            globalAmountTextView.setText(String.valueOf("Global amount: $" + presenter.getInteractor().getBudget()));
+            globalAmountTextView.setText("Global amount: $" + presenter.calculateGlobalAmount());
             limitTextView.setText("Limit: $" + presenter.getInteractor().getTotalLimit());
         } catch (ParseException e) {
             e.printStackTrace();

@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 
 public class userModel {
-    public static Account account = new Account(100000.0, 20000.0, 5000.0);
+    public static Account account = new Account(42000.0, 20000.0, 5000.0);
     public static ArrayList<Transaction> transactions;
 
     static {
@@ -30,7 +30,7 @@ public class userModel {
                 "Electricity expenses", Transaction.Type.REGULARPAYMENT, "Standard monthly" +
                 " bill for electricity expenses in January is $100. This amount goes to your power company. " +
                 "Total amount of $100 has been included in your Transaction Manager app.",
-                30, sdf.parse("15-02-2020")));
+                30, sdf.parse("15-08-2020")));
         transactions.add( new Transaction(sdf.parse("17-03-2020"), 4125,
                 "Motorbike purchase", Transaction.Type.PURCHASE, "New Yamaha motorbike " +
                 "bought at Yamaha Sarajevo motorbike store. Black color with the maximum speed of 220 km/h." +
@@ -106,10 +106,10 @@ public class userModel {
                 0,null));
         transactions.add( new Transaction(sdf.parse("15-05-2020"), 40,
                 "Internet expenses", Transaction.Type.REGULARPAYMENT,
-                "Bill for internet expenses in March is $40. This amount goes to BHTelecom internet provider. " +
+                "Bill for internet expenses is $40. This amount goes to BHTelecom internet provider. " +
                         "Total amount of $40 has been included in your Transaction Manager app.",
                 30, sdf.parse("27-07-2020")));
-        transactions.add( new Transaction(sdf.parse("01-05-2020"), 140,
+        transactions.add( new Transaction(sdf.parse("01-09-2020"), 140,
                 "RHCP tickets", Transaction.Type.PURCHASE, "Two tickets for the Red Hot Chili Peppers " +
                 "performance in Firenze. Date: June, 13th. Total amount of $140 has been included in your Transaction Manager app.",
                 0, null));
