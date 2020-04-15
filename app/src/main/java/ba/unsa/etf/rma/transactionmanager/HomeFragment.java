@@ -38,6 +38,7 @@ public class HomeFragment extends Fragment {
         swipeAdapter.addFragment(new BudgetFragment());
         swipeAdapter.addFragment(new GraphsFragment());
         viewPager.setAdapter(swipeAdapter);
+        viewPager.addOnPageChangeListener(new CircularViewPagerHandler(viewPager));
 
     }
 
