@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimary">#007264</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
     <color name="backgroundOne">#9FD3CCCC</color>
     <color name="customStyleColor2">#880E4F</color>
     <color name="ghostWhite">#f8f8ff</color>
-    <color name="customStyleColorDark">#680C43</color>
+    <color name="customStyleColorDark">#380142</color>
     <color name="saveBtnColor">#169617</color>
     <color name="deleteBtnColor">#B41D1D</color>
     <color name="shadow">#000000</color>

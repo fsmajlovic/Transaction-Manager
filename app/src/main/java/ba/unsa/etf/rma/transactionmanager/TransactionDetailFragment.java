@@ -435,14 +435,13 @@ public class TransactionDetailFragment extends Fragment {
                     Calendar calOne = Calendar.getInstance();
                     Calendar calTwo = Calendar.getInstance();
                     try {
-                        totalSpent = 0.0;
-                        monthSpent = 0.0;
                         calTwo.setTime(sdf2.parse(dateEditText.getText().toString()));
                         TransactionDetailPresenter presenterDetails = new TransactionDetailPresenter(getActivity());
+                        monthSpent = 0.0;
+                        totalSpent = presenterDetails.calculateSpentOnly();
                         for (Transaction t : presenterDetails.getInteractor().getTransactions()) {
                             if (t.getType().toString().equals("PURCHASE") || t.getType().toString().equals("REGULARPAYMENT") ||
                                     t.getType().toString().equals("INDIVIDUALPAYMENT")) {
-                                totalSpent = totalSpent + t.getAmount();
                                 calOne.setTime(t.getDate());
                                 int monthOne = calOne.get(Calendar.MONTH);
                                 int monthTwo = calTwo.get(Calendar.MONTH);
@@ -530,6 +529,13 @@ public class TransactionDetailFragment extends Fragment {
             } else {
                 ((TransactionDetailPresenter) presenter).saveTransaction(transactionParc, newTransaction);
             }
+            titleEditText.setBackgroundColor(Color.parseColor("#541068"));
+            dateEditText.setBackgroundColor(Color.parseColor("#541068"));
+            amountEditText.setBackgroundColor(Color.parseColor("#541068"));
+            typeEditText.setBackgroundColor(Color.parseColor("#541068"));
+            descriptionEditText.setBackgroundColor(Color.parseColor("#541068"));
+            endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
+            intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
             or.refreshFragment();
         } catch (ParseException e) {
             e.printStackTrace();

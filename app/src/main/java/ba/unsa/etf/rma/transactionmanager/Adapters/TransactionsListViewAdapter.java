@@ -10,6 +10,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +56,7 @@ public class TransactionsListViewAdapter extends ArrayAdapter<Transaction> {
         name.setText(currentTransaction.getTitle());
 
         TextView genre = (TextView) listItem.findViewById(R.id.transactionAmountTextView);
-        genre.setText(String.valueOf(currentTransaction.getAmount()));
+        genre.setText("$" + String.valueOf(currentTransaction.getAmount()));
 
         return listItem;
     }

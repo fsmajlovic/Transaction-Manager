@@ -4,6 +4,7 @@ import android.content.Context;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 public class TransactionDetailPresenter implements ITransactionDetailPresenter{
@@ -58,7 +59,6 @@ public class TransactionDetailPresenter implements ITransactionDetailPresenter{
         for(Transaction t: interactor.getTransactions()){
             if(oldTransaction.equals(t)){
                 t.setTitle(newTransaction.getTitle());
-                System.out.println(newTransaction.getDate().toString());
                 t.setDate(newTransaction.getDate());
                 t.setAmount(newTransaction.getAmount());
                 t.setType(newTransaction.getType());
@@ -77,6 +77,35 @@ public class TransactionDetailPresenter implements ITransactionDetailPresenter{
                 break;
             }
         }
+    }
+
+    public double calculateSpentOnly(){
+            double spent = 0.0;
+            for(Transaction t: interactor.getTransactions()){
+                if(t.getType().equals(Transaction.Type.REGULARPAYMENT)){
+                    Date startDate = t.getDate();
+                    Date endDate = t.getEndDate();
+                    int times = 0;
+                    while(startDate.compareTo(endDate) < 0){
+                        int interval = t.getTransactionInterval();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(startDate);
+                        c.add(Calendar.DATE, interval);
+                        startDate = c.getTime();
+                        times++;
+                    }
+                    if(times == 0){
+                        spent += t.getAmount();
+                    }
+                    else
+                        spent = spent + times*t.getAmount();
+                }
+                else if(t.getType().equals(Transaction.Type.INDIVIDUALPAYMENT) ||
+                        t.getType().equals(Transaction.Type.PURCHASE)){
+                    spent += t.getAmount();
+                }
+            }
+            return spent;
     }
 
 }
