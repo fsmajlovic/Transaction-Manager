@@ -132,7 +132,7 @@ public class userModel {
                 20, sdf.parse("22-10-2020")));
 
         transactions.add( new Transaction(sdf.parse("22-04-2020"), 1110,
-                "Bonus Salary 1", Transaction.Type.REGULARINCOME, "This is your Freelancer Bonus Salary that you receive" +
+                "Bonus Salary 1", Transaction.Type.REGULARINCOME, "This is your Freelancer Bonus Salary that you receive " +
                 "for every month from April to July throughout the year.",
                 30, sdf.parse("22-07-2020")));
 

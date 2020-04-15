@@ -129,10 +129,10 @@
 
     <Button
         android:id="@+id/saveBtn"
-        android:layout_width="64dp"
-        android:layout_height="41dp"
+        android:layout_width="100dp"
+        android:layout_height="35dp"
         android:layout_marginStart="40dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="36dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:background="@color/saveBtnColor"
@@ -142,17 +142,17 @@
         android:textStyle="bold|italic"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/deleteBtn"
-        app:layout_constraintHorizontal_bias="0.114"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/endDateEditText"
-        app:layout_constraintVertical_bias="0.478" />
+        app:layout_constraintVertical_bias="0.479" />
 
     <Button
         android:id="@+id/deleteBtn"
-        android:layout_width="64dp"
-        android:layout_height="41dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="60dp"
+        android:layout_width="100dp"
+        android:layout_height="35dp"
+        android:layout_marginTop="36dp"
+        android:layout_marginEnd="40dp"
         android:layout_marginBottom="8dp"
         android:background="@color/deleteBtnColor"
         android:shadowColor="@color/shadow"
@@ -162,7 +162,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/intervalEditText"
-        app:layout_constraintVertical_bias="0.478" />
+        app:layout_constraintVertical_bias="0.479" />
 
     <TextView
         android:id="@+id/textView"

@@ -375,4 +375,17 @@ public class TransactionListFragment extends Fragment {
         super.onStart();
         listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        TransactionsPresenter presenter = null;
+        try {
+            presenter = new TransactionsPresenter();
+            globalAmountTextView.setText(String.valueOf("Global amount: $" + presenter.getInteractor().getBudget()));
+            limitTextView.setText("Limit: $" + presenter.getInteractor().getTotalLimit());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 }

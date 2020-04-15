@@ -142,4 +142,17 @@ public class BudgetFragment extends Fragment {
 
         return fragmentView;
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        try {
+            presenter = new BudgetPresenter();
+            budgetEditText.setText(String.valueOf(presenter.getInteractor().getBudget()));
+            monthLimitEditText.setText(String.valueOf(presenter.getInteractor().getMonthLimit()));
+            totalLimitEditText.setText(String.valueOf(presenter.getInteractor().getTotalLimit()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 }
