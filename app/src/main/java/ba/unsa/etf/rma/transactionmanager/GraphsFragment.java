@@ -179,9 +179,9 @@ public class GraphsFragment extends Fragment {
 
 
         for(int i = 0; i < numberOfEntries; i++){
-            entriesSpent.add(new BarEntry(i, (int) money_spent_sums_array[i]));
-            entriesEarned.add(new BarEntry(i, (int) money_earned_sums_array[i]));
-            entriesTotal.add(new BarEntry(i, (int) money_total_sums_array[i]));
+            entriesSpent.add(new BarEntry(i+1, (int) money_spent_sums_array[i]));
+            entriesEarned.add(new BarEntry(i+1, (int) money_earned_sums_array[i]));
+            entriesTotal.add(new BarEntry(i+1, (int) money_total_sums_array[i]));
         }
 
         //Spent
