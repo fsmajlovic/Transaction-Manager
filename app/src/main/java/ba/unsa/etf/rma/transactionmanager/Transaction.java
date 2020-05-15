@@ -22,12 +22,17 @@ public class Transaction implements Parcelable {
     private int transactionInterval;
     private Date endDate;
 
+    private int id;
+    private int transactionTypeID;
+
 
     protected Transaction(Parcel in) {
         amount = in.readDouble();
         title = in.readString();
         itemDescription = in.readString();
         transactionInterval = in.readInt();
+        id = in.readInt();
+        transactionTypeID = in.readInt();
     }
 
     public static final Creator<Transaction> CREATOR = new Creator<Transaction>() {
@@ -53,6 +58,8 @@ public class Transaction implements Parcelable {
         parcel.writeString(title);
         parcel.writeString(itemDescription);
         parcel.writeInt(transactionInterval);
+        parcel.writeInt(id);
+        parcel.writeInt(transactionTypeID);
     }
 
     public Transaction() {
@@ -66,6 +73,37 @@ public class Transaction implements Parcelable {
         this.itemDescription = itemDescription;
         this.transactionInterval = transactionInterval;
         this.endDate = endDate;
+    }
+
+    public Transaction(int id, Date date, double amount, String title,  String itemDescription, int transactionInterval, Date endDate, int transID) {
+        this.id = id;
+        this.date = date;
+        this.amount = amount;
+        this.title = title;
+        this.itemDescription = itemDescription;
+        this.transactionInterval = transactionInterval;
+        this.endDate = endDate;
+        this.transactionTypeID = transID;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getTransactionTypeID() {
+        return transactionTypeID;
+    }
+
+    public void setTransactionTypeID(int transactionTypeID) {
+        this.transactionTypeID = transactionTypeID;
+    }
+
+    public static Creator<Transaction> getCREATOR() {
+        return CREATOR;
     }
 
     public Type getType() {
