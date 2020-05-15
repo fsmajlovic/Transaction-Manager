@@ -1,8 +1,8 @@
 package ba.unsa.etf.rma.transactionmanager;
 
-import android.content.Context;
-
 import java.text.ParseException;
+
+import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsInteractor;
 
 public class GraphPresenter {
     private TransactionsInteractor interactor;

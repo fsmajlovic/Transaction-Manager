@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">Transaction Manager</string>
+    <string
+        name="api_id"
+        >1a90adbb-4968-4995-98f6-bde3431728d5</string>
 </resources>

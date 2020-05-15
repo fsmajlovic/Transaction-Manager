@@ -1,10 +1,11 @@
-package ba.unsa.etf.rma.transactionmanager;
+package ba.unsa.etf.rma.transactionmanager.TransactionList;
 
 import java.text.ParseException;
-import java.time.Duration;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
+
+import ba.unsa.etf.rma.transactionmanager.Transaction;
+import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsInteractor;
 
 public class TransactionsPresenter {
     private TransactionsInteractor interactor;

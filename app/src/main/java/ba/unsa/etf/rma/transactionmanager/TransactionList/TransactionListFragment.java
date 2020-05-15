@@ -1,14 +1,8 @@
-package ba.unsa.etf.rma.transactionmanager;
+package ba.unsa.etf.rma.transactionmanager.TransactionList;
 
-import androidx.annotation.ColorRes;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Movie;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -18,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ScrollView;
@@ -41,17 +34,8 @@ import ba.unsa.etf.rma.transactionmanager.Comparators.PriceComparatorDescending;
 import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorAscending;
 import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorDescending;
 
-import androidx.fragment.app.Fragment;
-import androidx.viewpager.widget.ViewPager;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import ba.unsa.etf.rma.transactionmanager.Adapters.FilterBySpinnerAdapter;
-import ba.unsa.etf.rma.transactionmanager.Adapters.SortBySpinnerAdapter;
-import ba.unsa.etf.rma.transactionmanager.Adapters.TransactionsListViewAdapter;
+import ba.unsa.etf.rma.transactionmanager.R;
+import ba.unsa.etf.rma.transactionmanager.Transaction;
 
 public class TransactionListFragment extends Fragment {
     private Spinner filterSpinner;

@@ -1,15 +1,13 @@
 package ba.unsa.etf.rma.transactionmanager;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-import androidx.viewpager.widget.ViewPager;
 
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
+import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionListFragment;
 
 
 public class MainActivity extends FragmentActivity implements TransactionListFragment.OnItemClick,

@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsInteractor;
+
 public class TransactionDetailPresenter implements ITransactionDetailPresenter{
     private Context context;
     private Transaction transaction;
