@@ -154,11 +154,38 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     android.R.layout.simple_spinner_item, arrayStringSortBy);
             adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_item);
             sortBySpinner.setAdapter(adapterSortBy);
-            
+            sortBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    filterTransactions();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
 
 
             //Filter Call
-                filterTransactions();
+            filterTransactions();
+
+            //Filter Spinner regulations
+            final String[] textArray = { "All", "Regular payment", "Regular income", "Purchase", "Individual income", "Individual payment"};
+            FilterBySpinnerAdapter filterBySpinnerAdapter = new FilterBySpinnerAdapter(getActivity(),
+                R.layout.custom_layout, textArray, imageArray);
+            filterSpinner.setAdapter(filterBySpinnerAdapter);
+            filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    filterTransactions();
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> adapterView) {
+
+                }
+            });
 
             //ListView regulations
             listView.setOnTouchListener(new View.OnTouchListener() {
@@ -189,11 +216,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     @Override
     public void setTransactionTypes(ArrayList<String> transactionTypes) {
-        String[] converted = new String[transactionTypes.size()];
-        converted = transactionTypes.toArray(converted);
-        FilterBySpinnerAdapter filterBySpinnerAdapter = new FilterBySpinnerAdapter(getActivity(),
-                R.layout.custom_layout, converted, imageArray);
-        filterSpinner.setAdapter(filterBySpinnerAdapter);
+//        String[] converted = new String[transactionTypes.size()];
+//        converted = transactionTypes.toArray(converted);
+//        FilterBySpinnerAdapter filterBySpinnerAdapter = new FilterBySpinnerAdapter(getActivity(),
+//                R.layout.custom_layout, converted, imageArray);
+//        filterSpinner.setAdapter(filterBySpinnerAdapter);
     }
 
     @Override
@@ -208,22 +235,38 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     public void filterTransactions(){
         String query = "";
+
+        if(sortBySpinner.getSelectedItemPosition() == 0)
+            query = "sort=amount.asc";
+        else if(sortBySpinner.getSelectedItemPosition() == 1)
+            query = "sort=amount.desc";
+        else if(sortBySpinner.getSelectedItemPosition() == 2)
+            query = "sort=title.asc";
+        else if(sortBySpinner.getSelectedItemPosition() == 3)
+            query = "sort=title.desc";
+        else if(sortBySpinner.getSelectedItemPosition() == 4)
+            query = "sort=date.asc";
+        else if(sortBySpinner.getSelectedItemPosition() == 5)
+            query = "sort=date.desc";
+
+
         if(filterSpinner.getSelectedItemPosition() == 1)
-            query += "typeId=1";
+            query += "&typeId=1";
         else if(filterSpinner.getSelectedItemPosition() == 2)
-            query += "typeId=2";
+            query += "&typeId=2";
         else if(filterSpinner.getSelectedItemPosition() == 3)
-            query += "typeId=3";
+            query += "&typeId=3";
         else if(filterSpinner.getSelectedItemPosition() == 4)
-            query += "typeId=4";
+            query += "&typeId=4";
         else if(filterSpinner.getSelectedItemPosition() == 5)
-            query += "typeId=5";
+            query += "&typeId=5";
+
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyy");
         monthTextView.setText(dateFormat.format(currentMonth.getTime()));
         int month = -1;
         int year = -1;
-        query = "&month=";
+        query += "&month=";
         month = currentMonth.get(Calendar.MONTH);
         year = currentMonth.get(Calendar.YEAR);
         if(month < 10 ) {
@@ -233,8 +276,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         query += "&year=";
         query += (String.valueOf(year));
 
-
-        System.out.println("ULAZNI QUERY" + query);
         getPresenter().getTransactionTypes(query);
 
     }
