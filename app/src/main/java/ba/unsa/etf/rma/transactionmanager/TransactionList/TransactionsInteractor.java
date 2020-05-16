@@ -64,6 +64,13 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
 
     @Override
     protected Void doInBackground(String... strings) {
+        String query = "";
+        try {
+            query = URLEncoder.encode(strings[0], "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(query);
         String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/transactionTypes";
         try {
             URL url = new URL(url1);
@@ -86,8 +93,9 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
             e.printStackTrace();
         }
 
-        for(int page = 1; page < 5; page++) {
-            String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions?page=" + page;
+        for(int page = 0; page < 5; page++) {
+            System.out.println("QUERY TRANS" + strings[0]);
+            String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions/filter?page=" + page + "&" + strings[0];
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                 URL url = new URL(url2);

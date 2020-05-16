@@ -18,11 +18,16 @@ import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.Queue;
 
 import ba.unsa.etf.rma.transactionmanager.Adapters.FilterBySpinnerAdapter;
 import ba.unsa.etf.rma.transactionmanager.Adapters.SortBySpinnerAdapter;
@@ -52,6 +57,9 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private TextView globalAmountTextView;
     private TextView limitTextView;
     private TextView addTransactionTextView;
+
+    //Month
+    private Calendar currentMonth;
 
     //Selected item variables
     int itemPosition, counter;
@@ -108,10 +116,9 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             arrowBackImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_backward));
             arrowForwardImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_forward));
 
-            getPresenter().getTransactionTypes("");
 
             //Month regulations
-            final Calendar currentMonth = Calendar.getInstance();
+            currentMonth = Calendar.getInstance();
             final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyy");
             monthTextView.setText(dateFormat.format(currentMonth.getTime()));
 
@@ -122,6 +129,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     monthTextView.setText(dateFormat.format(currentMonth.getTime()));
                     counter = 0;
                     itemPosition = -1;
+                    filterTransactions();
                     //setupForAddItem();
                 }
             });
@@ -132,10 +140,25 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     monthTextView.setText(dateFormat.format(currentMonth.getTime()));
                     counter = 0;
                     itemPosition = -1;
+                    filterTransactions();
                     //setupForAddItem();
                 }
             });
 
+            //Sort By
+            String[] arrayStringSortBy = {
+                    "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
+                    "Date - Ascending", "Date - Descending"
+            };
+            ArrayAdapter<String> adapterSortBy = new SortBySpinnerAdapter(getActivity(),
+                    android.R.layout.simple_spinner_item, arrayStringSortBy);
+            adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_item);
+            sortBySpinner.setAdapter(adapterSortBy);
+            
+
+
+            //Filter Call
+                filterTransactions();
 
             //ListView regulations
             listView.setOnTouchListener(new View.OnTouchListener() {
@@ -153,15 +176,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             }
         });
 
-            //Sort By
-            String[] arrayStringSortBy = {
-                "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
-                "Date - Ascending", "Date - Descending"
-        };
-        ArrayAdapter<String> adapterSortBy = new SortBySpinnerAdapter(getActivity(),
-                android.R.layout.simple_spinner_item, arrayStringSortBy);
-        adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_item);
-        sortBySpinner.setAdapter(adapterSortBy);
 
 
             return fragmentView;
@@ -169,9 +183,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     @Override
     public void setTransactions(ArrayList<Transaction> transactions) {
-        for(Transaction transaction: transactions){
-            System.out.println("Transakcija" + transaction.getTitle() + " " + transaction.getDate());
-        }
         listViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout.list_item, transactions);
         listView.setAdapter(listViewAdapter);
     }
@@ -194,6 +205,40 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     public void notifyTransactionTypeSetChanged() {
         //filterBySpinnerAdapter.notifyDataSetChanged();
     }
+
+    public void filterTransactions(){
+        String query = "";
+        if(filterSpinner.getSelectedItemPosition() == 1)
+            query += "typeId=1";
+        else if(filterSpinner.getSelectedItemPosition() == 2)
+            query += "typeId=2";
+        else if(filterSpinner.getSelectedItemPosition() == 3)
+            query += "typeId=3";
+        else if(filterSpinner.getSelectedItemPosition() == 4)
+            query += "typeId=4";
+        else if(filterSpinner.getSelectedItemPosition() == 5)
+            query += "typeId=5";
+
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyy");
+        monthTextView.setText(dateFormat.format(currentMonth.getTime()));
+        int month = -1;
+        int year = -1;
+        query = "&month=";
+        month = currentMonth.get(Calendar.MONTH);
+        year = currentMonth.get(Calendar.YEAR);
+        if(month < 10 ) {
+            query += "0";
+        }
+        query += (String.valueOf(month+1));
+        query += "&year=";
+        query += (String.valueOf(year));
+
+
+        System.out.println("ULAZNI QUERY" + query);
+        getPresenter().getTransactionTypes(query);
+
+    }
+
 }
 
 
