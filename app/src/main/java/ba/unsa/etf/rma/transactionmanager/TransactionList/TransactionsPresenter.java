@@ -29,10 +29,13 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
 
 
     @Override
-    public void onDoneTransactionType(ArrayList<String> results) {
+    public void onDoneTransactionType(ArrayList<String> results, ArrayList<Transaction> transactions) {
         view.setTransactionTypes(results);
         view.notifyTransactionTypeSetChanged();
+        view.setTransactions(transactions);
+        view.notifyTransactionListDataSetChanged();
     }
+
 
 
     //OLD

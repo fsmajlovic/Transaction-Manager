@@ -17,7 +17,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
@@ -28,7 +31,6 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
     ArrayList<String> transactionTypes;
     ArrayList<Transaction> transactions;
     private OnGetTransactionTypesDone callerTypes;
-    private OnGetTransactionListDone callerTransactions;
 
     public TransactionsInteractor(){
 
@@ -37,12 +39,9 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
     public TransactionsInteractor(OnGetTransactionTypesDone p) {
         callerTypes = p;
         transactionTypes = new ArrayList<String>();
+        transactions = new ArrayList<Transaction>();
     };
 
-    public TransactionsInteractor(OnGetTransactionListDone p){
-        callerTransactions = p;
-        transactions = new ArrayList<>();
-    }
 
     public String convertStreamToString(InputStream is) {
         BufferedReader reader = new BufferedReader(new
@@ -73,6 +72,7 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
             String result = convertStreamToString(in);
             JSONObject jo = new JSONObject(result);
             JSONArray results = jo.getJSONArray("rows");
+            transactionTypes.add("All");
             for (int i = 0; i < results.length(); i++) {
                 JSONObject transactionType = results.getJSONObject(i);
                 String title = transactionType.getString("name");
@@ -85,47 +85,105 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return null;
-    }
 
-    protected Void getTransactions(String... strings) {
-        String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions";
-        try {
-            URL url = new URL(url1);
-            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            String result = convertStreamToString(in);
-            JSONObject jo = new JSONObject(result);
-            JSONArray results = jo.getJSONArray("transactions");
-            for (int i = 0; i < results.length(); i++) {
-                JSONObject transactionJSON = results.getJSONObject(i);
-                int id = transactionJSON.getInt("id");
+        for(int page = 1; page < 5; page++) {
+            String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions?page=" + page;
+            try {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                URL url = new URL(url2);
+                HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                String result = convertStreamToString(in);
+                JSONObject jo = new JSONObject(result);
+                JSONArray results = jo.getJSONArray("transactions");
+                for (int i = 0; i < results.length(); i++) {
+                    JSONObject transactionJSON = results.getJSONObject(i);
+                    int id = transactionJSON.getInt("id");
+                    String date = transactionJSON.getString("date");
+                    String title = transactionJSON.getString("title");
+                    Double amount = transactionJSON.getDouble("amount");
+                    String itemDescription = transactionJSON.getString("itemDescription");
+                    String transactionInterval = transactionJSON.getString("transactionInterval");
+                    String endDate = transactionJSON.getString("endDate");
+                    int transactionTypeID = transactionJSON.getInt("TransactionTypeId");
 
+                    if (transactionInterval.equals("null")) {
+                        transactionInterval = "0";
+                    }
+                    try {
+                        if (endDate.equals("null")) {
+                            transactions.add(new Transaction(id, sdf.parse(date), amount, title, itemDescription,
+                                    Integer.valueOf(transactionInterval), null, transactionTypeID));
+                        } else {
+                            transactions.add(new Transaction(id, sdf.parse(date), amount, title, itemDescription,
+                                    Integer.valueOf(transactionInterval), sdf.parse(endDate), transactionTypeID));
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
         }
+
         return null;
     }
+
 
     @Override
     protected void onPostExecute(Void aVoid){
         super.onPostExecute(aVoid);
-        callerTypes.onDoneTransactionType(transactionTypes);
-        callerTransactions.onDoneTransactionList(transactions);
+        callerTypes.onDoneTransactionType(transactionTypes, transactions);
     }
 
     public interface OnGetTransactionTypesDone{
-        public void onDoneTransactionType(ArrayList<String> results);
-    }
-
-    public interface OnGetTransactionListDone{
-        public void onDoneTransactionList(ArrayList<Transaction> results);
+        public void onDoneTransactionType(ArrayList<String> results, ArrayList<Transaction> transactions);
     }
 
 
+    //OLD
+    @Override
+    public ArrayList<Transaction> getTransactions() {
+        return userModel.transactions;
+    }
+
+    @Override
+    public double getBudget() {
+        return userModel.account.getBudget();
+    }
+
+    @Override
+    public double getTotalLimit() {
+        return userModel.account.getTotalLimit();
+    }
+
+    @Override
+    public double getMonthLimit() {
+        return userModel.account.getMonthLimit();
+    }
+
+    @Override
+    public void setBudget(double budget) {
+        userModel.account.setBudget(budget);
+    }
+
+    @Override
+    public void setMonthLimit(double monthLimit) {
+        userModel.account.setMonthLimit(monthLimit);
+    }
+
+    @Override
+    public void setTotalLimit(double totalLimit) {
+        userModel.account.setTotalLimit(totalLimit);
+    }
+
+    @Override
+    public Account getAccount() {
+        return userModel.account;
+    }
 }

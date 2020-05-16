@@ -39,15 +39,15 @@ public class TransactionsListViewAdapter extends ArrayAdapter<Transaction> {
         Transaction currentTransaction = transactionsList.get(position);
 
         ImageView image = (ImageView)listItem.findViewById(R.id.transactionTypeImageView);
-        if(currentTransaction.getType() == Transaction.Type.INDIVIDUALPAYMENT)
+        if(currentTransaction.getTransactionTypeID() == 5)
             image.setImageResource(R.drawable.ic_individual_payment_icon);
-        else if(currentTransaction.getType() == Transaction.Type.REGULARPAYMENT)
+        else if(currentTransaction.getTransactionTypeID() == 1)
             image.setImageResource(R.drawable.ic_regular_payment_icon);
-        else if(currentTransaction.getType() == Transaction.Type.PURCHASE)
+        else if(currentTransaction.getTransactionTypeID() == 3)
             image.setImageResource(R.drawable.ic_purchase_icon);
-        else if(currentTransaction.getType() == Transaction.Type.INDIVIDUALINCOME)
+        else if(currentTransaction.getTransactionTypeID() == 4)
             image.setImageResource(R.drawable.ic_individual_income_icon);
-        else if(currentTransaction.getType() == Transaction.Type.REGULARINCOME)
+        else if(currentTransaction.getTransactionTypeID() == 2)
             image.setImageResource(R.drawable.ic_regular_income_icon);
 
 

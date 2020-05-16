@@ -53,9 +53,15 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private TextView limitTextView;
     private TextView addTransactionTextView;
 
+    //Selected item variables
+    int itemPosition, counter;
+
+    //TransactionsList
+    private TransactionsListViewAdapter transactionsListViewAdapter;
+
     //FilterBy
     private FilterBySpinnerAdapter filterBySpinnerAdapter;
-    private Integer[] imageArray = {R.drawable.ic_regular_payment_icon, R.drawable.ic_regular_income_icon,
+    private Integer[] imageArray = {R.drawable.ic_all_icon, R.drawable.ic_regular_payment_icon, R.drawable.ic_regular_income_icon,
             R.drawable.ic_purchase_icon,R.drawable.ic_individual_income_icon, R.drawable.ic_individual_payment_icon};
 
     //Presenter
@@ -104,31 +110,89 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
             getPresenter().getTransactionTypes("");
 
+            //Month regulations
+            final Calendar currentMonth = Calendar.getInstance();
+            final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyy");
+            monthTextView.setText(dateFormat.format(currentMonth.getTime()));
+
+            arrowBackImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    currentMonth.add(Calendar.MONTH, -1);
+                    monthTextView.setText(dateFormat.format(currentMonth.getTime()));
+                    counter = 0;
+                    itemPosition = -1;
+                    //setupForAddItem();
+                }
+            });
+            arrowForwardImageView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    currentMonth.add(Calendar.MONTH, +1);
+                    monthTextView.setText(dateFormat.format(currentMonth.getTime()));
+                    counter = 0;
+                    itemPosition = -1;
+                    //setupForAddItem();
+                }
+            });
+
+
+            //ListView regulations
+            listView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                ScrollView mScrollView = fragmentView.findViewById(R.id.scrollViewList);
+                mScrollView.requestDisallowInterceptTouchEvent(true);
+                int action = motionEvent.getActionMasked();
+                switch (action){
+                    case MotionEvent.ACTION_UP:
+                        mScrollView.requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+                return false;
+            }
+        });
+
+            //Sort By
+            String[] arrayStringSortBy = {
+                "Price - Ascending", "Price - Descending", "Title - Ascending", "Title - Descending",
+                "Date - Ascending", "Date - Descending"
+        };
+        ArrayAdapter<String> adapterSortBy = new SortBySpinnerAdapter(getActivity(),
+                android.R.layout.simple_spinner_item, arrayStringSortBy);
+        adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_item);
+        sortBySpinner.setAdapter(adapterSortBy);
+
+
             return fragmentView;
         }
 
     @Override
     public void setTransactions(ArrayList<Transaction> transactions) {
-
+        for(Transaction transaction: transactions){
+            System.out.println("Transakcija" + transaction.getTitle() + " " + transaction.getDate());
+        }
+        listViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout.list_item, transactions);
+        listView.setAdapter(listViewAdapter);
     }
 
     @Override
     public void setTransactionTypes(ArrayList<String> transactionTypes) {
         String[] converted = new String[transactionTypes.size()];
         converted = transactionTypes.toArray(converted);
-        FilterBySpinnerAdapter adapterFilterBySpinner = new FilterBySpinnerAdapter(getActivity(),
+        FilterBySpinnerAdapter filterBySpinnerAdapter = new FilterBySpinnerAdapter(getActivity(),
                 R.layout.custom_layout, converted, imageArray);
-        filterSpinner.setAdapter(adapterFilterBySpinner);
+        filterSpinner.setAdapter(filterBySpinnerAdapter);
     }
 
     @Override
     public void notifyTransactionListDataSetChanged() {
-
+        //transactionsListViewAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void notifyTransactionTypeSetChanged() {
-
+        //filterBySpinnerAdapter.notifyDataSetChanged();
     }
 }
 
