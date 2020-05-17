@@ -57,6 +57,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private TextView globalAmountTextView;
     private TextView limitTextView;
     private TextView addTransactionTextView;
+    private OnItemClick oic;
 
     //Month
     private Calendar currentMonth;
@@ -187,7 +188,19 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                 }
             });
 
+            //Item selected regulations
+            counter = 0;
+            itemPosition = -1;
+
             //ListView regulations
+            try {
+                oic = (OnItemClick)getActivity();
+            } catch (ClassCastException e) {
+                throw new ClassCastException(getActivity().toString() +
+                        "Treba implementirati OnItemClick");
+            }
+
+            listView.setOnItemClickListener(listItemClickListener);
             listView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -250,17 +263,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             query = "sort=date.desc";
 
 
-        if(filterSpinner.getSelectedItemPosition() == 1)
-            query += "&typeId=1";
-        else if(filterSpinner.getSelectedItemPosition() == 2)
-            query += "&typeId=2";
-        else if(filterSpinner.getSelectedItemPosition() == 3)
-            query += "&typeId=3";
-        else if(filterSpinner.getSelectedItemPosition() == 4)
-            query += "&typeId=4";
-        else if(filterSpinner.getSelectedItemPosition() == 5)
-            query += "&typeId=5";
-
+        if(filterSpinner.getSelectedItemPosition() != 0)
+            query += ("&typeId=" + String.valueOf(filterSpinner.getSelectedItemPosition()));
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM, yyy");
         monthTextView.setText(dateFormat.format(currentMonth.getTime()));
@@ -279,6 +283,38 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         getPresenter().getTransactionTypes(query);
 
     }
+
+
+        private AdapterView.OnItemClickListener listItemClickListener =
+            new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view,
+                                        int position, long id) {
+                    TransactionsListViewAdapter transactionListAdapter = new TransactionsListViewAdapter(getActivity(), R.layout.list_item, filteredTransactions);
+                    Transaction sendTransaction = (Transaction) listView.getItemAtPosition(position);
+
+                    if(itemPosition != position && counter == 1)
+                        return;
+
+                    oic.onItemClicked(sendTransaction, false);
+
+                    if(itemPosition == position && counter == 1){
+                        //listView.setItemChecked(position, false);
+                        view.setBackgroundColor(Color.parseColor("#f8f8ff"));
+                        counter = 0;
+                        itemPosition = -1;
+                        //setupForAddItem();
+                    }
+                    else {
+                        //listView.setItemChecked(position, true);
+                        view.setBackgroundColor(Color.parseColor("#B8A228"));
+                        counter = 1;
+                        itemPosition = position;
+                    }
+                    transactionListAdapter.notifyDataSetChanged();
+
+                }
+            };
 
 }
 

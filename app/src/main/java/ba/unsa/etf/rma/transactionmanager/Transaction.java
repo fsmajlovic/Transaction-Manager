@@ -8,10 +8,11 @@ import java.util.Date;
 public class Transaction implements Parcelable {
     public enum Type {
         INDIVIDUALPAYMENT,
-        REGULARPAYMENT,
+        REGULARINCOME,
         PURCHASE,
         INDIVIDUALINCOME,
-        REGULARINCOME
+        REGULARPAYMENT
+
     };
 
     private Date date;
@@ -84,6 +85,7 @@ public class Transaction implements Parcelable {
         this.transactionInterval = transactionInterval;
         this.endDate = endDate;
         this.transactionTypeID = transID;
+        this.type = Type.values()[transID-1];
     }
 
     public int getId() {
