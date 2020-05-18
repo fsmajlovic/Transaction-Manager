@@ -114,6 +114,16 @@ public class Transaction implements Parcelable {
 
     public void setType(Type type) {
         this.type = type;
+        if(type == Type.INDIVIDUALPAYMENT)
+            this.transactionTypeID = 1;
+        else if(type == Type.REGULARINCOME)
+            this.transactionTypeID = 2;
+        else if(type == Type.PURCHASE)
+            this.transactionTypeID = 3;
+        else if(type == Type.INDIVIDUALINCOME)
+            this.transactionTypeID = 4;
+        else if(type == Type.REGULARPAYMENT)
+            this.transactionTypeID = 5;
     }
 
     public Date getDate() {

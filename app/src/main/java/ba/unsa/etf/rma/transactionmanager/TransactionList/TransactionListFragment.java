@@ -58,6 +58,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private TextView limitTextView;
     private TextView addTransactionTextView;
     private OnItemClick oic;
+    private OnAddItem oai;
+    private OnAddTextViewClick oatvc;
 
     //Month
     private Calendar currentMonth;
@@ -191,13 +193,26 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             //Item selected regulations
             counter = 0;
             itemPosition = -1;
+            try {
+                oai = (OnAddItem)getActivity();
+            } catch (ClassCastException e) {
 
+                throw new ClassCastException(getActivity().toString() +
+                        "Treba implementirati OnAddItem");
+            }
             //ListView regulations
             try {
                 oic = (OnItemClick)getActivity();
             } catch (ClassCastException e) {
                 throw new ClassCastException(getActivity().toString() +
                         "Treba implementirati OnItemClick");
+            }
+            try {
+                oatvc = (OnAddTextViewClick) getActivity();
+            } catch (ClassCastException e) {
+
+                throw new ClassCastException(getActivity().toString() +
+                        "Treba implementirati OnAddTextViewClicked");
             }
 
             listView.setOnItemClickListener(listItemClickListener);
@@ -216,6 +231,13 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             }
         });
 
+            //Add item
+            addTransactionTextView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                oatvc.onAddClicked(true);
+            }
+            });
 
 
             return fragmentView;
@@ -315,6 +337,12 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
                 }
             };
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        filterTransactions();
+    }
 
 }
 

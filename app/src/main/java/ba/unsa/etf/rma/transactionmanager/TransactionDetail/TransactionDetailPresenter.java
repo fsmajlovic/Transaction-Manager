@@ -1,4 +1,4 @@
-package ba.unsa.etf.rma.transactionmanager;
+package ba.unsa.etf.rma.transactionmanager.TransactionDetail;
 
 import android.content.Context;
 
@@ -7,18 +7,36 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import ba.unsa.etf.rma.transactionmanager.Transaction;
+import ba.unsa.etf.rma.transactionmanager.TransactionDetail.ITransactionDetailPresenter;
+import ba.unsa.etf.rma.transactionmanager.TransactionList.ITransactionListView;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsInteractor;
 
-public class TransactionDetailPresenter implements ITransactionDetailPresenter{
+public class TransactionDetailPresenter implements ITransactionDetailPresenter {
+    private TransactionDetailInteractor Detailsinteractor;
+    private ITransactionDetailView view;
     private Context context;
+
+
+    public TransactionDetailPresenter(ITransactionDetailView view, Context context){
+        this.view = view;
+        this.context = context;
+    }
+
+    @Override
+    public void addDeleteEdit(String query, Transaction transactionOld, Transaction transactionNew, int action) {
+        new TransactionDetailInteractor(transactionOld, transactionNew, action).execute(query);
+    }
+
+    //OLD
     private Transaction transaction;
     private TransactionsInteractor interactor;
-
 
     public TransactionDetailPresenter(Context context) throws ParseException {
         this.context    = context;
         interactor = new TransactionsInteractor();
     }
+
 
     @Override
     public void create(Date date, double amount, String title, Transaction.Type type, String itemDescription, int transactionInterval, Date endDate) {

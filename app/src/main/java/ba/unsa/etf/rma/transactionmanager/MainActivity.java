@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
+import ba.unsa.etf.rma.transactionmanager.TransactionDetail.TransactionDetailFragment;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionListFragment;
 
 

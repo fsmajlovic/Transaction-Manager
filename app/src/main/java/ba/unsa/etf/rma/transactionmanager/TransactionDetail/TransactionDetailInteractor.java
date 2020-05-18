@@ -1,0 +1,101 @@
+package ba.unsa.etf.rma.transactionmanager.TransactionDetail;
+
+import android.os.AsyncTask;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+
+import ba.unsa.etf.rma.transactionmanager.Transaction;
+
+public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void> implements ITransactionDetailInteractor {
+    private Transaction transactionOld;
+    private Transaction transactionNew;
+    private int action;
+
+    private OnAddDeleteEditDone caller;
+
+    public TransactionDetailInteractor(Transaction transactionOld, Transaction transactionNew, int action){
+        this.transactionOld = transactionOld;
+        this.transactionNew = transactionNew;
+        this.action = action;
+    }
+
+    @Override
+    protected Void doInBackground(String... strings) {
+
+        if(action == 1) {
+            try {
+                URL urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions");
+                HttpURLConnection con = (HttpURLConnection) urlPost.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
+                con.setRequestProperty("Accept", "application/json");
+                con.setDoOutput(true);
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                String strDate = dateFormat.format(transactionNew.getDate());
+                String jsonInputString = "{ \"date\": \"" + strDate + "\", \"title\": \"" + transactionNew.getTitle() + "\", \"amount\":"
+                        + String.valueOf(transactionNew.getAmount()) + ", \"typeId\":" + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
+                System.out.println("STRING OUTPT" + jsonInputString);
+                try (OutputStream os = con.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    System.out.println(response.toString());
+                }
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
+    }
+
+
+    @Override
+    protected void onPostExecute(Void aVoid){
+        super.onPostExecute(aVoid);
+        //caller.onDoneAddDeleteEdit();
+    }
+
+    public interface OnAddDeleteEditDone{
+        public void onDoneAddDeleteEdit();
+    }
+
+    public Transaction getTransactionOld() {
+        return transactionOld;
+    }
+
+    public void setTransactionOld(Transaction transactionOld) {
+        this.transactionOld = transactionOld;
+    }
+
+    public Transaction getTransactionNew() {
+        return transactionNew;
+    }
+
+    public void setTransactionNew(Transaction transactionNew) {
+        this.transactionNew = transactionNew;
+    }
+
+}

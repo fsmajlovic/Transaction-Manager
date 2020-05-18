@@ -1,10 +1,8 @@
-package ba.unsa.etf.rma.transactionmanager;
+package ba.unsa.etf.rma.transactionmanager.TransactionDetail;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.Movie;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -19,10 +17,16 @@ import androidx.fragment.app.Fragment;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 
-public class TransactionDetailFragment extends Fragment {
+import ba.unsa.etf.rma.transactionmanager.R;
+import ba.unsa.etf.rma.transactionmanager.Transaction;
+import ba.unsa.etf.rma.transactionmanager.TransactionDetail.ITransactionDetailPresenter;
+import ba.unsa.etf.rma.transactionmanager.TransactionDetail.TransactionDetailPresenter;
+import ba.unsa.etf.rma.transactionmanager.TransactionList.ITransactionListPresenter;
+import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsPresenter;
+
+public class TransactionDetailFragment extends Fragment implements ITransactionDetailView{
     private EditText titleEditText;
     private EditText dateEditText;
     private EditText amountEditText;
@@ -52,7 +56,13 @@ public class TransactionDetailFragment extends Fragment {
         void refreshFragment();
     }
 
-
+    private ITransactionDetailPresenter TransactionDetailPresenter;
+    public ITransactionDetailPresenter getPresenter() {
+        if (TransactionDetailPresenter == null) {
+            TransactionDetailPresenter = new TransactionDetailPresenter(this, getActivity());
+        }
+        return TransactionDetailPresenter;
+    }
 
     @Override
     public View onCreateView(
@@ -525,7 +535,8 @@ public class TransactionDetailFragment extends Fragment {
 
             presenter = new TransactionDetailPresenter(getActivity());
             if (eOa) {
-                ((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
+                //((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
+                getPresenter().addDeleteEdit("", null, newTransaction, 1);
             } else {
                 ((TransactionDetailPresenter) presenter).saveTransaction(transactionParc, newTransaction);
             }

@@ -12,14 +12,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
@@ -28,8 +31,8 @@ import ba.unsa.etf.rma.transactionmanager.userModel;
 
 public class TransactionsInteractor extends AsyncTask<String, Integer, Void> implements ITransactionInteractor {
 
-    ArrayList<String> transactionTypes;
-    ArrayList<Transaction> transactions;
+    private ArrayList<String> transactionTypes;
+    private ArrayList<Transaction> transactions;
     private OnGetTransactionTypesDone callerTypes;
 
     public TransactionsInteractor(){
