@@ -7,13 +7,15 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import ba.unsa.etf.rma.transactionmanager.Budget.BudgetInteractor;
+import ba.unsa.etf.rma.transactionmanager.Budget.BudgetPresenter;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsInteractor;
 
 public class TransactionsPresenter implements ITransactionListPresenter, TransactionsInteractor.OnGetTransactionTypesDone{
-    private TransactionsInteractor interactor;
     private ITransactionListView view;
     private Context context;
+    private ArrayList<Transaction> transactions;
 
 
     public TransactionsPresenter(ITransactionListView view, Context context){
@@ -35,6 +37,8 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
         view.setTransactions(transactions);
         view.notifyTransactionListDataSetChanged();
     }
+
+
 
 
 

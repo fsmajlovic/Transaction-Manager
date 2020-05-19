@@ -66,6 +66,7 @@ public class MainActivity extends FragmentActivity implements TransactionListFra
     public void onItemClicked(Transaction transaction, boolean eOa) {
         Bundle arguments = new Bundle();
         arguments.putParcelable("transaction", transaction);
+        arguments.putInt("transactionId", transaction.getId());
         arguments.putBoolean("editOrAdd", eOa);
         TransactionDetailFragment detailFragment = new TransactionDetailFragment();
         detailFragment.setArguments(arguments);

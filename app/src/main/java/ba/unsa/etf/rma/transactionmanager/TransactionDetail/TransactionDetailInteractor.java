@@ -32,48 +32,59 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
     @Override
     protected Void doInBackground(String... strings) {
 
-        if(action == 1) {
-            try {
-                URL urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions");
-                HttpURLConnection con = (HttpURLConnection) urlPost.openConnection();
-                con.setRequestMethod("POST");
-                con.setRequestProperty("Content-Type", "application/json");
-                con.setRequestProperty("Accept", "application/json");
-                con.setDoOutput(true);
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-
-
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                String strDate = dateFormat.format(transactionNew.getDate());
-                String strEndDate = "null";
-                 if(transactionNew.getEndDate() != null){
-                     strEndDate = dateFormat.format(transactionNew.getEndDate());
-                 }
-
-                String jsonInputString = "{ \"date\": \"" + strDate + "\", \"title\": \"" +
-                        transactionNew.getTitle() + "\", \"amount\":" + String.valueOf(transactionNew.getAmount())
-                        + ", \"endDate\": \"" + strEndDate + "\", \"itemDescription\": \"" + transactionNew.getItemDescription()
-                        + "\", \"transactionInterval\": \"" + String.valueOf(transactionNew.getTransactionInterval())
-                        + "\", \"typeId\": " + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
-                System.out.println("STRING OUTPT" + jsonInputString);
-                try (OutputStream os = con.getOutputStream()) {
-                    byte[] input = jsonInputString.getBytes("utf-8");
-                    os.write(input, 0, input.length);
-                }
-                try (BufferedReader br = new BufferedReader(
-                        new InputStreamReader(con.getInputStream(), "utf-8"))) {
-                    StringBuilder response = new StringBuilder();
-                    String responseLine = null;
-                    while ((responseLine = br.readLine()) != null) {
-                        response.append(responseLine.trim());
-                    }
-                    System.out.println(response.toString());
-                }
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+        URL urlPost = null;
+        try {
+            if(action == 1) {
+                urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions");
             }
+            else if(action == 2){
+                urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions/"
+                        + String.valueOf(transactionNew.getId()));
+                System.out.println("Transakcija id: " + transactionNew.getId());
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            HttpURLConnection con = (HttpURLConnection) urlPost.openConnection();
+            con.setRequestMethod("POST");
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+
+
+            DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+            String strDate = dateFormat.format(transactionNew.getDate());
+            String strEndDate = "null";
+             if(transactionNew.getEndDate() != null){
+                 strEndDate = dateFormat.format(transactionNew.getEndDate());
+             }
+
+            String jsonInputString = "{ \"date\": \"" + strDate + "\", \"title\": \"" +
+                    transactionNew.getTitle() + "\", \"amount\":" + String.valueOf(transactionNew.getAmount())
+                    + ", \"endDate\": \"" + strEndDate + "\", \"itemDescription\": \"" + transactionNew.getItemDescription()
+                    + "\", \"transactionInterval\": \"" + String.valueOf(transactionNew.getTransactionInterval())
+                    + "\", \"typeId\": " + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
+            System.out.println("STRING OUTPT" + jsonInputString);
+            try (OutputStream os = con.getOutputStream()) {
+                byte[] input = jsonInputString.getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                System.out.println(response.toString());
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
         return null;

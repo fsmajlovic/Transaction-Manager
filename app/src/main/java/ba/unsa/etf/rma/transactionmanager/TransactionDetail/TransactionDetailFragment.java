@@ -538,7 +538,12 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                 //((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
                 getPresenter().addDeleteEdit("", null, newTransaction, 1);
             } else {
-                ((TransactionDetailPresenter) presenter).saveTransaction(transactionParc, newTransaction);
+                int transID = 0;
+                if (getArguments() != null && getArguments().containsKey("transactionId")) {
+                    transID = getArguments().getInt("transactionId");
+                }
+                newTransaction.setId(transID);
+                getPresenter().addDeleteEdit("", null, newTransaction, 2);
             }
             titleEditText.setBackgroundColor(Color.parseColor("#541068"));
             dateEditText.setBackgroundColor(Color.parseColor("#541068"));

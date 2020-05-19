@@ -15,6 +15,10 @@ public class BudgetPresenter implements IBudgetPresenter, BudgetInteractor.OnAcc
         this.context = context;
     }
 
+    public BudgetPresenter(){
+
+    }
+
 
     @Override
     public void create(double budget, double totalLimit, double monthLimit) {
