@@ -45,8 +45,16 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
 
                 DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
                 String strDate = dateFormat.format(transactionNew.getDate());
-                String jsonInputString = "{ \"date\": \"" + strDate + "\", \"title\": \"" + transactionNew.getTitle() + "\", \"amount\":"
-                        + String.valueOf(transactionNew.getAmount()) + ", \"typeId\":" + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
+                String strEndDate = "null";
+                 if(transactionNew.getEndDate() != null){
+                     strEndDate = dateFormat.format(transactionNew.getEndDate());
+                 }
+
+                String jsonInputString = "{ \"date\": \"" + strDate + "\", \"title\": \"" +
+                        transactionNew.getTitle() + "\", \"amount\":" + String.valueOf(transactionNew.getAmount())
+                        + ", \"endDate\": \"" + strEndDate + "\", \"itemDescription\": \"" + transactionNew.getItemDescription()
+                        + "\", \"transactionInterval\": \"" + String.valueOf(transactionNew.getTransactionInterval())
+                        + "\", \"typeId\": " + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
                 System.out.println("STRING OUTPT" + jsonInputString);
                 try (OutputStream os = con.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
