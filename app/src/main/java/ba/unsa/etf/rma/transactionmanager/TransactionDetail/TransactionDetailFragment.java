@@ -394,13 +394,11 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                         .setMessage("Are you sure you want to delete this transaction?")
                         .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-                                try {
-                                    presenter = new TransactionDetailPresenter(getActivity());
-                                    ((TransactionDetailPresenter) presenter).deleteTransaction(transactionParc);
-                                } catch (ParseException e) {
-                                    e.printStackTrace();
-                                }
+                                    int transID = 0;
+                                    if (getArguments() != null && getArguments().containsKey("transactionId")) {
+                                        transID = getArguments().getInt("transactionId");
+                                    }
+                                    getPresenter().addDeleteEdit("", transID, null, 3);
                                 oid.onItemDeleted(transactionParc);
 
                             }
@@ -536,14 +534,13 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
             presenter = new TransactionDetailPresenter(getActivity());
             if (eOa) {
                 //((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
-                getPresenter().addDeleteEdit("", null, newTransaction, 1);
+                getPresenter().addDeleteEdit("", 0, newTransaction, 1);
             } else {
                 int transID = 0;
                 if (getArguments() != null && getArguments().containsKey("transactionId")) {
                     transID = getArguments().getInt("transactionId");
                 }
-                newTransaction.setId(transID);
-                getPresenter().addDeleteEdit("", null, newTransaction, 2);
+                getPresenter().addDeleteEdit("", transID, newTransaction, 2);
             }
             titleEditText.setBackgroundColor(Color.parseColor("#541068"));
             dateEditText.setBackgroundColor(Color.parseColor("#541068"));

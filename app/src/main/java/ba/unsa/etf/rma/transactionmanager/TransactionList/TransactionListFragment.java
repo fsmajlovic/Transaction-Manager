@@ -245,6 +245,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     @Override
     public void setTransactions(ArrayList<Transaction> transactions) {
+        for(Transaction t: transactions)
+            System.out.println(t.getTitle() + " " + t.getId());
         listViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout.list_item, transactions);
         listView.setAdapter(listViewAdapter);
     }
