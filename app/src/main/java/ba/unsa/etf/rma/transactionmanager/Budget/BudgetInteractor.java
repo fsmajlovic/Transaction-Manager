@@ -12,11 +12,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
 
@@ -50,13 +53,41 @@ public class BudgetInteractor extends AsyncTask<String, Integer, Void> implement
 
     @Override
     protected Void doInBackground(String... strings) {
-        String query = null;
-        try {
-            query = URLEncoder.encode(strings[0], "utf-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+
         String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + "1a90adbb-4968-4995-98f6-bde3431728d5";
+
+        if(!strings[0].equals("")) {
+            try {
+                URL urlPost = new URL(url1);
+                HttpURLConnection con = (HttpURLConnection) urlPost.openConnection();
+                con.setRequestMethod("POST");
+                con.setRequestProperty("Content-Type", "application/json");
+                con.setRequestProperty("Accept", "application/json");
+                con.setDoOutput(true);
+
+                String jsonInputString = strings[0];
+                System.out.println("STRING OUTPT" + jsonInputString);
+                try (OutputStream os = con.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+                try (BufferedReader br = new BufferedReader(
+                        new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                    StringBuilder response = new StringBuilder();
+                    String responseLine = null;
+                    while ((responseLine = br.readLine()) != null) {
+                        response.append(responseLine.trim());
+                    }
+                    System.out.println(response.toString());
+                }
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         try {
             URL url = new URL(url1);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -69,13 +100,10 @@ public class BudgetInteractor extends AsyncTask<String, Integer, Void> implement
             double monthLimit = jsonObject.getDouble("monthLimit");
             account = new Account(id, budget, totalLimit, monthLimit);
         } catch (MalformedURLException e) {
-            System.out.println("IZUZETAK1");
             e.printStackTrace();
         } catch (IOException e) {
-            System.out.println("IZUZETAK2");
             e.printStackTrace();
         } catch (JSONException e) {
-            System.out.println("IZUZETAK3");
             e.printStackTrace();
         }
 

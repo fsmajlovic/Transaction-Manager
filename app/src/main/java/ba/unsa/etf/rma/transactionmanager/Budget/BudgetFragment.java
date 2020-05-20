@@ -25,7 +25,7 @@ import ba.unsa.etf.rma.transactionmanager.Budget.IBudgetView;
 import ba.unsa.etf.rma.transactionmanager.R;
 
 public class BudgetFragment extends Fragment implements IBudgetView {
-    private TextView budgetEditText;
+    private EditText budgetEditText;
     private EditText totalLimitEditText;
     private EditText monthLimitEditText;
     private TextView saveTextView;
@@ -103,7 +103,9 @@ public class BudgetFragment extends Fragment implements IBudgetView {
             @Override
             public void onClick(View view) {
                 if(budgetVal && monthVal && totalVal){
-                    //Post here
+                    getPresenter().searchAccount("{\"budget\":" + budgetEditText.getText().toString()
+                            + ",\"monthLimit\":" + monthLimitEditText.getText().toString()
+                            + ",\"totalLimit\":" + totalLimitEditText.getText().toString() + "}");
                 }
                 else {
                     new AlertDialog.Builder(getActivity(), R.style.AlertDialog)
