@@ -7,6 +7,8 @@ import androidx.fragment.app.FragmentManager;
 import android.os.Bundle;
 import android.widget.FrameLayout;
 
+import java.util.ArrayList;
+
 import ba.unsa.etf.rma.transactionmanager.TransactionDetail.TransactionDetailFragment;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionListFragment;
 
@@ -63,11 +65,19 @@ public class MainActivity extends FragmentActivity implements TransactionListFra
 
 
     @Override
-    public void onItemClicked(Transaction transaction, boolean eOa) {
+    public void onItemClicked(Transaction transaction, boolean eOa, double totalLimit,
+                              double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll) {
+        for(Transaction t: transactionsAll){
+            System.out.println("Alltrans:" + t.getTitle());
+        }
         Bundle arguments = new Bundle();
         arguments.putParcelable("transaction", transaction);
         arguments.putInt("transactionId", transaction.getId());
         arguments.putBoolean("editOrAdd", eOa);
+        arguments.putDouble("totalLimit", totalLimit);
+        arguments.putDouble("monthLimit", monthLimit);
+        arguments.putDouble("spentOnly", spentOnly);
+        arguments.putParcelableArrayList("transactionsAll", transactionsAll);
         TransactionDetailFragment detailFragment = new TransactionDetailFragment();
         detailFragment.setArguments(arguments);
         if (twoPaneMode){

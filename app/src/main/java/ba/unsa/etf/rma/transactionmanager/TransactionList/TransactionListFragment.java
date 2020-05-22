@@ -2,7 +2,9 @@ package ba.unsa.etf.rma.transactionmanager.TransactionList;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.graphics.Movie;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -29,6 +32,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Queue;
 
+import ba.unsa.etf.rma.transactionmanager.Account;
 import ba.unsa.etf.rma.transactionmanager.Adapters.FilterBySpinnerAdapter;
 import ba.unsa.etf.rma.transactionmanager.Adapters.SortBySpinnerAdapter;
 import ba.unsa.etf.rma.transactionmanager.Adapters.TransactionsListViewAdapter;
@@ -60,6 +64,9 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private OnItemClick oic;
     private OnAddItem oai;
     private OnAddTextViewClick oatvc;
+    private TextView loading;
+    private ProgressBar progressBar;
+    private double totalLimit, monthLimit, spentOnly;
 
     //Month
     private Calendar currentMonth;
@@ -77,6 +84,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     //Presenter
     private ITransactionListPresenter TransactionListPresenter;
+    private ArrayList<Transaction> transactionsAll;
+
     public ITransactionListPresenter getPresenter() {
         if (TransactionListPresenter == null) {
             TransactionListPresenter = new TransactionsPresenter(this, getActivity());
@@ -86,7 +95,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     //OnItemInterfaces
         public interface OnItemClick {
-        void onItemClicked(Transaction transaction, boolean eOa);
+        void onItemClicked(Transaction transaction, boolean eOa, double totalLimit,
+                           double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll);
     }
 
 
@@ -105,7 +115,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             ViewGroup container,
             Bundle savedInstanceState) {
 
-
             final View fragmentView = inflater.inflate(R.layout.fragment_list, container, false);
             filterSpinner = (Spinner) fragmentView.findViewById(R.id.filterSpinner);
             sortBySpinner = (Spinner) fragmentView.findViewById(R.id.sortBySpinner);
@@ -118,6 +127,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             addTransactionTextView = fragmentView.findViewById(R.id.addTransactionTextView);
             arrowBackImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_backward));
             arrowForwardImageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_arrow_forward));
+            loading = (TextView) fragmentView.findViewById(R.id.loadingTextView);
+            progressBar = (ProgressBar) fragmentView.findViewById(R.id.progressBar);
+            progressBar.setProgressTintList(ColorStateList.valueOf(Color.RED));
+            loading.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.VISIBLE);
 
 
             //Month regulations
@@ -132,6 +146,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     monthTextView.setText(dateFormat.format(currentMonth.getTime()));
                     counter = 0;
                     itemPosition = -1;
+                    loading.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
                     //setupForAddItem();
                 }
@@ -143,6 +159,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     monthTextView.setText(dateFormat.format(currentMonth.getTime()));
                     counter = 0;
                     itemPosition = -1;
+                    loading.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
                     //setupForAddItem();
                 }
@@ -158,8 +176,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             adapterSortBy.setDropDownViewResource(android.R.layout.simple_spinner_item);
             sortBySpinner.setAdapter(adapterSortBy);
             sortBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    loading.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
                 }
 
@@ -181,6 +202,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                    loading.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
                 }
 
@@ -216,6 +239,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             }
 
             listView.setOnItemClickListener(listItemClickListener);
+            transactionsListViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout. list_item, new ArrayList<Transaction>());
+            listView.setAdapter(transactionsListViewAdapter);
             listView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -245,30 +270,31 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     @Override
     public void setTransactions(ArrayList<Transaction> transactions) {
-        for(Transaction t: transactions)
-            System.out.println(t.getTitle() + " " + t.getId());
-        listViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout.list_item, transactions);
-        listView.setAdapter(listViewAdapter);
+        transactionsListViewAdapter.setTransactions(transactions);
     }
 
-    @Override
-    public void setTransactionTypes(ArrayList<String> transactionTypes) {
-//        String[] converted = new String[transactionTypes.size()];
-//        converted = transactionTypes.toArray(converted);
-//        FilterBySpinnerAdapter filterBySpinnerAdapter = new FilterBySpinnerAdapter(getActivity(),
-//                R.layout.custom_layout, converted, imageArray);
-//        filterSpinner.setAdapter(filterBySpinnerAdapter);
-    }
 
     @Override
     public void notifyTransactionListDataSetChanged() {
-        //transactionsListViewAdapter.notifyDataSetChanged();
+        transactionsListViewAdapter.notifyDataSetChanged();
+        loading.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
-    public void notifyTransactionTypeSetChanged() {
-        //filterBySpinnerAdapter.notifyDataSetChanged();
+    public void setGlobalTotal(double globalAmount, double totalLimit) {
+        globalAmountTextView.setText("Global amount: $" + String.valueOf(globalAmount));
+        limitTextView.setText("Limit: $" + String.valueOf(totalLimit));
     }
+
+    @Override
+    public void passAccAndSpent(double totalLimit, double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll) {
+        this.totalLimit = totalLimit;
+        this.monthLimit = monthLimit;
+        this.spentOnly = spentOnly;
+        this.transactionsAll = transactionsAll;
+    }
+
 
     public void filterTransactions(){
         String query = "";
@@ -295,12 +321,12 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         int month = -1;
         int year = -1;
         query += "&month=";
-        month = currentMonth.get(Calendar.MONTH);
-        year = currentMonth.get(Calendar.YEAR);
+        month =  currentMonth.get(Calendar.MONTH) + 1;
+        year =   currentMonth.get(Calendar.YEAR);
         if(month < 10 ) {
             query += "0";
         }
-        query += (String.valueOf(month+1));
+        query += (String.valueOf(month));
         query += "&year=";
         query += (String.valueOf(year));
 
@@ -320,7 +346,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     if(itemPosition != position && counter == 1)
                         return;
 
-                    oic.onItemClicked(sendTransaction, false);
+                    oic.onItemClicked(sendTransaction, false, totalLimit, monthLimit, spentOnly, transactionsAll);
 
                     if(itemPosition == position && counter == 1){
                         //listView.setItemChecked(position, false);
@@ -343,6 +369,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     @Override
     public void onResume() {
         super.onResume();
+        loading.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
         filterTransactions();
     }
 

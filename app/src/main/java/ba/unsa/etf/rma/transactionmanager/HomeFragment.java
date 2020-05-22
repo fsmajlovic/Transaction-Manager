@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
 import ba.unsa.etf.rma.transactionmanager.Budget.BudgetFragment;
+import ba.unsa.etf.rma.transactionmanager.Graphs.GraphsFragment;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionListFragment;
 
 public class HomeFragment extends Fragment {

@@ -60,4 +60,9 @@ public class TransactionsListViewAdapter extends ArrayAdapter<Transaction> {
 
         return listItem;
     }
+
+    public void setTransactions(ArrayList<Transaction> transactions) {
+        transactionsList.clear();
+        transactionsList.addAll(transactions);
+    }
 }

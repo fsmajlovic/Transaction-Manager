@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import ba.unsa.etf.rma.transactionmanager.R;
@@ -443,11 +444,24 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                     Calendar calOne = Calendar.getInstance();
                     Calendar calTwo = Calendar.getInstance();
                     try {
+                        double totalLimit = 0, monthLimit = 0, spentOnly = 0;
+                        ArrayList<Transaction> transactionsAll = new ArrayList<Transaction>();
+                        if (getArguments() != null && getArguments().containsKey("totalLimit")
+                                && getArguments().containsKey("monthLimit")
+                                && getArguments().containsKey("spentOnly")
+                                && getArguments().containsKey("transactionsAll")) {
+                            totalLimit = getArguments().getDouble("totalLimit");
+                            monthLimit = getArguments().getDouble("monthLimit");
+                            spentOnly = getArguments().getDouble("spentOnly");
+                            transactionsAll = getArguments().getParcelableArrayList("transactionsAll");
+                            System.out.println("DETAILS RESPONSE: totalLimit " + totalLimit + " monthlimit " + monthLimit + " spentonly " + spentOnly + " " + transactionsAll.get(0).getTitle());
+                        }
+
+
                         calTwo.setTime(sdf2.parse(dateEditText.getText().toString()));
-                        TransactionDetailPresenter presenterDetails = new TransactionDetailPresenter(getActivity());
                         monthSpent = 0.0;
-                        totalSpent = presenterDetails.calculateSpentOnly();
-                        for (Transaction t : presenterDetails.getInteractor().getTransactions()) {
+                        totalSpent = spentOnly;
+                        for (Transaction t : transactionsAll) {
                             if (t.getType().toString().equals("PURCHASE") || t.getType().toString().equals("REGULARPAYMENT") ||
                                     t.getType().toString().equals("INDIVIDUALPAYMENT")) {
                                 calOne.setTime(t.getDate());
@@ -459,13 +473,13 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                         }
 
                         String whatWentOver = "";
-                        double value = presenterDetails.getInteractor().getMonthLimit();
-                        if (newAmount + monthSpent > presenterDetails.getInteractor().getMonthLimit())
+                        double value = monthLimit;
+                        if (newAmount + monthSpent > monthLimit)
                             whatWentOver = "month";
-                        if (newAmount + totalSpent > presenterDetails.getInteractor().getTotalLimit())
+                        if (newAmount + totalSpent > totalLimit)
                             whatWentOver = "global";
-                        if ((newAmount + totalSpent > presenterDetails.getInteractor().getTotalLimit()
-                                || newAmount + monthSpent > presenterDetails.getInteractor().getMonthLimit()) &&
+                        if ((newAmount + totalSpent > totalLimit
+                                || newAmount + monthSpent > monthLimit) &&
                                 (typeEditText.getText().toString().equals("INDIVIDUALPAYMENT") ||
                                         typeEditText.getText().toString().equals("PURCHASE") ||
                                         typeEditText.getText().toString().equals("REGULARPAYMENT"))) {
@@ -473,9 +487,9 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                                     .setTitle("Over limit")
                                     .setMessage("With this transaction you went over your " + whatWentOver +
                                             " limit. In this month you've spent: $" + monthSpent + " (limit is $" +
-                                            presenterDetails.getInteractor().getMonthLimit() + ") and " +
+                                            monthLimit + ") and " +
                                             "in total you've spent: $" + totalSpent + " (limit is $" +
-                                            presenterDetails.getInteractor().getTotalLimit() + ")." +
+                                            totalLimit + ")." +
                                             "Are you sure you want to continue?")
                                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                                         public void onClick(DialogInterface dialog, int which) {
@@ -531,7 +545,6 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                 e.printStackTrace();
             }
 
-            presenter = new TransactionDetailPresenter(getActivity());
             if (eOa) {
                 //((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
                 getPresenter().addDeleteEdit("", 0, newTransaction, 1);

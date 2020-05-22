@@ -1,10 +1,12 @@
-package ba.unsa.etf.rma.transactionmanager;
+package ba.unsa.etf.rma.transactionmanager.Graphs;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -12,7 +14,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.github.mikephil.charting.charts.BarChart;
-import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarEntry;
@@ -23,28 +24,47 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class GraphsFragment extends Fragment {
-    private GraphPresenter presenter;
+import ba.unsa.etf.rma.transactionmanager.Graphs.GraphPresenter;
+import ba.unsa.etf.rma.transactionmanager.R;
+import ba.unsa.etf.rma.transactionmanager.Transaction;
+import ba.unsa.etf.rma.transactionmanager.TransactionList.ITransactionListPresenter;
+import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsPresenter;
+
+public class GraphsFragment extends Fragment implements IGraphsView{
     private BarChart chartOne;
     private BarChart chartTwo;
     private BarChart chartThree;
     private TextView periodTextView;
+    private ArrayList<Transaction> transactions;
+    private TextView loading;
+    private ProgressBar progressBar;
+
+    private IGraphsPresenter GraphPresenter;
+    public IGraphsPresenter getPresenter() {
+        if (GraphPresenter == null) {
+            GraphPresenter = new GraphPresenter(this, getActivity());
+        }
+        return GraphPresenter;
+    }
 
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View fragmentView = inflater.inflate(R.layout.fragment_graphs, container, false);
+        transactions = new ArrayList<Transaction>();
         chartOne = (BarChart) fragmentView.findViewById(R.id.chartOne);
         chartTwo = (BarChart) fragmentView.findViewById(R.id.chartTwo);
         chartThree = (BarChart) fragmentView.findViewById(R.id.chartThree);
         periodTextView = (TextView) fragmentView.findViewById(R.id.periodTextView);
-        try {
-            presenter = new GraphPresenter();
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        loading = (TextView) fragmentView.findViewById(R.id.loadingTextView);
+        progressBar = (ProgressBar) fragmentView.findViewById(R.id.progressBar);
+        progressBar.setProgressTintList(ColorStateList.valueOf(Color.RED));
+        loading.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        getPresenter().getTransactions("");
 
         periodTextView.setText("Monthly");
         periodTextView.setOnClickListener(new View.OnClickListener() {
@@ -70,12 +90,13 @@ public class GraphsFragment extends Fragment {
             }
         });
 
-        validateGraphs();
+
 
         return fragmentView;
     }
 
 
+    @Override
     public void validateGraphs(){
         java.util.Date date= new Date();
         Calendar cal = Calendar.getInstance();
@@ -86,7 +107,7 @@ public class GraphsFragment extends Fragment {
         Arrays.fill(money_earned_sums_array, 0.0);
         Arrays.fill(money_total_sums_array, 0.0);
 
-        for(Transaction t: presenter.getInteractor().getTransactions()){
+        for(Transaction t: this.transactions){
             //Getting date from transaction
             date = t.getDate();
             cal.setTime(date);
@@ -184,6 +205,9 @@ public class GraphsFragment extends Fragment {
             entriesTotal.add(new BarEntry(i+1, (int) money_total_sums_array[i]));
         }
 
+        loading.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+
         //Spent
         BarDataSet setSpent = new BarDataSet(entriesSpent, "Spent money");
         setSpent.setColor(Color.parseColor("#B41D1D"));
@@ -213,6 +237,12 @@ public class GraphsFragment extends Fragment {
         chartThree.setData(dataTotal);
         chartThree.setFitBars(true); // make the x-axis fit exactly all bars
         chartThree.invalidate(); //
+
     }
 
+    @Override
+    public void setTransactions(ArrayList<Transaction> transactions) {
+        this.transactions.clear();
+        this.transactions.addAll(transactions);
+    }
 }

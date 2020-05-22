@@ -25,7 +25,7 @@ import ba.unsa.etf.rma.transactionmanager.Budget.IBudgetView;
 import ba.unsa.etf.rma.transactionmanager.R;
 
 public class BudgetFragment extends Fragment implements IBudgetView {
-    private EditText budgetEditText;
+    private TextView budgetEditText;
     private EditText totalLimitEditText;
     private EditText monthLimitEditText;
     private TextView saveTextView;
@@ -136,7 +136,6 @@ public class BudgetFragment extends Fragment implements IBudgetView {
     @Override
     public void onResume() {
         super.onResume();
-        refreshView();
     }
 }
 //        try {

@@ -66,7 +66,6 @@ public class BudgetInteractor extends AsyncTask<String, Integer, Void> implement
                 con.setDoOutput(true);
 
                 String jsonInputString = strings[0];
-                System.out.println("STRING OUTPT" + jsonInputString);
                 try (OutputStream os = con.getOutputStream()) {
                     byte[] input = jsonInputString.getBytes("utf-8");
                     os.write(input, 0, input.length);
