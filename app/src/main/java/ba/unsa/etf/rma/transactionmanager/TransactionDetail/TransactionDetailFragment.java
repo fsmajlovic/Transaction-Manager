@@ -105,6 +105,8 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                 final String receivedAmount = String.valueOf(transactionParc.getAmount());
                 final String receivedType = transactionParc.getType().toString();
                 String receivedDescription = transactionParc.getItemDescription();
+                if(receivedDescription.equals("null"))
+                    receivedDescription = "";
                 String receivedEndDate = "";
                 if(transactionParc.getEndDate() != null) {
                     receivedEndDate = formatter.format(transactionParc.getEndDate());
