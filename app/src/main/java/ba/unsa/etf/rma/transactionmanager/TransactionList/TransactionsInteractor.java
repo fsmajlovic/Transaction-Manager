@@ -70,7 +70,6 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
     @Override
     protected Void doInBackground(String... strings) {
 
-        System.out.println("QUERY INPT: " + strings[0]);
 
         //Getting account info
         String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + "1a90adbb-4968-4995-98f6-bde3431728d5";

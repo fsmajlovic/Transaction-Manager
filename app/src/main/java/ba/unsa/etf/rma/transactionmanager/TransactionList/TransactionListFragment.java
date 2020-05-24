@@ -270,7 +270,41 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     @Override
     public void setTransactions(ArrayList<Transaction> transactions) {
+        ArrayList<Transaction> additionalTransactions = new ArrayList<Transaction>();
+        additionalTransactions = getAdditionalTransactions(transactions);
+        transactions.addAll(additionalTransactions);
         transactionsListViewAdapter.setTransactions(transactions);
+    }
+
+    private ArrayList<Transaction> getAdditionalTransactions(ArrayList<Transaction> transactions) {
+        ArrayList<Transaction> additionalTransactions = new ArrayList<Transaction>();
+        additionalTransactions.clear();
+        int repeatCounter = 0;
+        int monthSelectedNumber =  currentMonth.get(Calendar.MONTH) + 1;
+        for(Transaction t: transactions) {
+            if (t.getType().equals(Transaction.Type.REGULARPAYMENT) ||
+                    (t.getType().equals(Transaction.Type.REGULARINCOME))) {
+                Date startDate = t.getDate();
+                Date endDate = t.getEndDate();
+                while (startDate.compareTo(endDate) < 0) {
+                    int interval = t.getTransactionInterval();
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(startDate);
+                    int monthCurrentNumber =  c.get(Calendar.MONTH) + 1;
+                    if(monthCurrentNumber == monthSelectedNumber){
+                        if(repeatCounter > 0) {
+                            additionalTransactions.add(t);
+                        }
+                        repeatCounter++;
+                    }
+                    c.add(Calendar.DATE, interval);
+                    startDate = c.getTime();
+                }
+            }
+            return additionalTransactions;
+        }
+
+        return additionalTransactions;
     }
 
 

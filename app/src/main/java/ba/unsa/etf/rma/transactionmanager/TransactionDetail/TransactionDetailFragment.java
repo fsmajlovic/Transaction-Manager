@@ -454,7 +454,6 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                             monthLimit = getArguments().getDouble("monthLimit");
                             spentOnly = getArguments().getDouble("spentOnly");
                             transactionsAll = getArguments().getParcelableArrayList("transactionsAll");
-                            System.out.println("DETAILS RESPONSE: totalLimit " + totalLimit + " monthlimit " + monthLimit + " spentonly " + spentOnly + " " + transactionsAll.get(0).getTitle());
                         }
 
 
