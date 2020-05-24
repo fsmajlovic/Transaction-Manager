@@ -273,7 +273,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         ArrayList<Transaction> additionalTransactions = new ArrayList<Transaction>();
         additionalTransactions = getAdditionalTransactions(transactions);
         transactions.addAll(additionalTransactions);
-        transactionsListViewAdapter.setTransactions(transactions);
+        if(!transactions.isEmpty()) {
+            additionalSort(filterSpinner.getSelectedItemPosition(), transactions);
+        }
+        loading.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     private ArrayList<Transaction> getAdditionalTransactions(ArrayList<Transaction> transactions) {
@@ -307,12 +311,50 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         return additionalTransactions;
     }
 
+    private void additionalSort(int typeId, ArrayList<Transaction> transactions) {
+        filteredTransactions = new ArrayList<>();
+        for(Transaction t: transactions) {
+            Calendar tDate = Calendar.getInstance();
+            SimpleDateFormat sdf = new SimpleDateFormat("MMMM, yyy");
+            String dateString = sdf.format(t.getDate().getTime());
+            try {
+                tDate.setTime(sdf.parse(dateString));
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            if (typeId == 0) {
+                filteredTransactions.add(t);
+            }
+            else if (tDate.compareTo(currentMonth) == 0 && t.getTransactionTypeID() == typeId) {
+                filteredTransactions.add(t);
+            }
+        }
+
+        String selectedSort = sortBySpinner.getSelectedItem().toString();
+        if(selectedSort.equals("Price - Ascending"))
+            Collections.sort(filteredTransactions, new PriceComparatorAscending());
+        else if(selectedSort.equals("Price - Descending"))
+            Collections.sort(filteredTransactions, new PriceComparatorDescending());
+        else if(selectedSort.equals("Title - Ascending"))
+            Collections.sort(filteredTransactions, new TitleComparatorAscending());
+        else if(selectedSort.equals("Title - Descending"))
+            Collections.sort(filteredTransactions, new TitleComparatorDescending());
+        else if(selectedSort.equals("Date - Ascending"))
+            Collections.sort(filteredTransactions, new DateComparatorAscending());
+        else if(selectedSort.equals("Date - Descending"))
+            Collections.sort(filteredTransactions, new DateComparatorDescending());
+
+
+        transactionsListViewAdapter.setTransactions(filteredTransactions);
+        listView.setAdapter(transactionsListViewAdapter);
+        transactionsListViewAdapter.notifyDataSetChanged();
+    }
+
 
     @Override
     public void notifyTransactionListDataSetChanged() {
         transactionsListViewAdapter.notifyDataSetChanged();
-        loading.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -407,6 +449,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         progressBar.setVisibility(View.VISIBLE);
         filterTransactions();
     }
+
+
 
 }
 
