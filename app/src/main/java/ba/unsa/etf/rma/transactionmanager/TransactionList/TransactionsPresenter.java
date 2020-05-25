@@ -32,7 +32,7 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
     @Override
     public void onDoneTransactionType(ArrayList<Transaction> trasactionsAll, ArrayList<Transaction> transactions,
                                       Account account) {
-        view.setTransactions(transactions);
+        view.setTransactions(transactions, trasactionsAll);
         view.notifyTransactionListDataSetChanged();
         double globalAmount = calculateGlobalAmount(trasactionsAll);
         view.setGlobalTotal(globalAmount, account.getTotalLimit());

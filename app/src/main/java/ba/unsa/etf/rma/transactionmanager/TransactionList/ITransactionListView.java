@@ -8,7 +8,7 @@ import ba.unsa.etf.rma.transactionmanager.Account;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
 
 public interface ITransactionListView {
-    void setTransactions(ArrayList<Transaction> transactions);
+    void setTransactions(ArrayList<Transaction> transactions, ArrayList<Transaction> transactionsAll);
     void notifyTransactionListDataSetChanged();
     void setGlobalTotal(double globalAmount, double totalLimit);
     void passAccAndSpent(double totalLimit, double monthLimit, double spentOnly, ArrayList<Transaction> transactions);

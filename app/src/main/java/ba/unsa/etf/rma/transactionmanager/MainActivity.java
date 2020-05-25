@@ -140,9 +140,15 @@ public class MainActivity extends FragmentActivity implements TransactionListFra
     }
 
     @Override
-    public void onAddClicked(boolean eOa) {
+    public void onAddClicked(boolean eOa, double totalLimit,
+                             double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll) {
         Bundle arguments = new Bundle();
         arguments.putBoolean("editOrAdd", eOa);
+        arguments.putBoolean("editOrAdd", eOa);
+        arguments.putDouble("totalLimit", totalLimit);
+        arguments.putDouble("monthLimit", monthLimit);
+        arguments.putDouble("spentOnly", spentOnly);
+        arguments.putParcelableArrayList("transactionsAll", transactionsAll);
         TransactionDetailFragment detailFragment = new TransactionDetailFragment();
         detailFragment.setArguments(arguments);
         if (twoPaneMode){

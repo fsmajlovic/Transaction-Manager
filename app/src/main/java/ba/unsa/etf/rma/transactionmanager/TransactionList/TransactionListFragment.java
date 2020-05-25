@@ -105,7 +105,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     }
 
     public interface OnAddTextViewClick{
-        void onAddClicked(boolean eOa);
+        void onAddClicked(boolean eOa,double totalLimit,
+                          double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll);
     }
 
 
@@ -260,7 +261,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             addTransactionTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                oatvc.onAddClicked(true);
+                oatvc.onAddClicked(true, totalLimit, monthLimit, spentOnly, transactionsAll);
             }
             });
 
@@ -269,15 +270,13 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         }
 
     @Override
-    public void setTransactions(ArrayList<Transaction> transactions) {
+    public void setTransactions(ArrayList<Transaction> transactions, ArrayList<Transaction> AllTransactions) {
         ArrayList<Transaction> additionalTransactions = new ArrayList<Transaction>();
-        additionalTransactions = getAdditionalTransactions(transactions);
+        additionalTransactions = getAdditionalTransactions(AllTransactions);
         transactions.addAll(additionalTransactions);
         if(!transactions.isEmpty()) {
             additionalSort(filterSpinner.getSelectedItemPosition(), transactions);
         }
-        loading.setVisibility(View.INVISIBLE);
-        progressBar.setVisibility(View.INVISIBLE);
     }
 
     private ArrayList<Transaction> getAdditionalTransactions(ArrayList<Transaction> transactions) {
@@ -305,7 +304,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     startDate = c.getTime();
                 }
             }
-            return additionalTransactions;
         }
 
         return additionalTransactions;
@@ -349,6 +347,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         transactionsListViewAdapter.setTransactions(filteredTransactions);
         listView.setAdapter(transactionsListViewAdapter);
         transactionsListViewAdapter.notifyDataSetChanged();
+        loading.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
 
