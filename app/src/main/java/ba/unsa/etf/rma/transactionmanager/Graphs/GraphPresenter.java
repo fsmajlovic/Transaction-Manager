@@ -24,8 +24,8 @@ public class GraphPresenter implements IGraphsPresenter, GraphsInteractor.OnGetT
 
 
     @Override
-    public void getTransactions(String query) {
-        new GraphsInteractor((GraphsInteractor.OnGetTransactionsDone) this).execute(query);
+    public void getTransactions(Context context, String query) {
+        new GraphsInteractor(context, (GraphsInteractor.OnGetTransactionsDone) this).execute(query);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.transactionmanager.Graphs;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
@@ -18,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
+import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.ITransactionInteractor;
 
@@ -25,8 +27,10 @@ public class GraphsInteractor extends AsyncTask<String, Integer, Void> implement
 
     private ArrayList<Transaction> transactions;
     private OnGetTransactionsDone callerTypes;
+    private Context context;
 
-    public GraphsInteractor(OnGetTransactionsDone p) {
+    public GraphsInteractor(Context context, OnGetTransactionsDone p) {
+        this.context = context;
         callerTypes = p;
         transactions = new ArrayList<Transaction>();
     };
@@ -53,8 +57,10 @@ public class GraphsInteractor extends AsyncTask<String, Integer, Void> implement
     @Override
     protected Void doInBackground(String... strings) {
 
+        String api_id = this.context.getResources().getString(R.string.api_id);
+
         for(int page = 0; page < 10; page++) {
-            String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions/?page=" + page;
+            String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + api_id + "/transactions/?page=" + page;
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 URL url = new URL(url2);

@@ -64,7 +64,7 @@ public class GraphsFragment extends Fragment implements IGraphsView{
         progressBar.setProgressTintList(ColorStateList.valueOf(Color.RED));
         loading.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-        getPresenter().getTransactions("");
+        getPresenter().getTransactions(getActivity(), "");
 
         periodTextView.setText("Monthly");
         periodTextView.setOnClickListener(new View.OnClickListener() {
