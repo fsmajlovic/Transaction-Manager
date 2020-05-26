@@ -51,7 +51,7 @@ public class BudgetFragment extends Fragment implements IBudgetView {
         monthLimitEditText = fragmentView.findViewById(R.id.monthLimitEditText);
         saveTextView = fragmentView.findViewById(R.id.saveTextView);
         //Comment cut from here
-        getPresenter().searchAccount("");
+        getPresenter().searchAccount(getActivity(), "");
 
         monthLimitEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -103,7 +103,7 @@ public class BudgetFragment extends Fragment implements IBudgetView {
             @Override
             public void onClick(View view) {
                 if(budgetVal && monthVal && totalVal){
-                    getPresenter().searchAccount("{\"budget\":" + budgetEditText.getText().toString()
+                    getPresenter().searchAccount(getActivity(), "{\"budget\":" + budgetEditText.getText().toString()
                             + ",\"monthLimit\":" + monthLimitEditText.getText().toString()
                             + ",\"totalLimit\":" + totalLimitEditText.getText().toString() + "}");
                 }

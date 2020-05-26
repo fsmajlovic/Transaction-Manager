@@ -36,8 +36,8 @@ public class BudgetPresenter implements IBudgetPresenter, BudgetInteractor.OnAcc
     }
 
     @Override
-    public void searchAccount(String query) {
-        new BudgetInteractor((BudgetInteractor.OnAccountSearchDone)this).execute(query);
+    public void searchAccount(Context context, String query) {
+        new BudgetInteractor(context, (BudgetInteractor.OnAccountSearchDone)this).execute(query);
     }
 
 

@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.transactionmanager.Budget;
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Movie;
 import android.os.AsyncTask;
@@ -22,13 +23,16 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
+import ba.unsa.etf.rma.transactionmanager.R;
 
 public class BudgetInteractor extends AsyncTask<String, Integer, Void> implements IBudgetInteractor {
 
     Account account;
     private OnAccountSearchDone caller;
+    private Context context;
 
-    public BudgetInteractor(OnAccountSearchDone p){
+    public BudgetInteractor(Context context, OnAccountSearchDone p){
+        this.context = context;
         caller = p;
     }
 
@@ -54,7 +58,10 @@ public class BudgetInteractor extends AsyncTask<String, Integer, Void> implement
     @Override
     protected Void doInBackground(String... strings) {
 
-        String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + "1a90adbb-4968-4995-98f6-bde3431728d5";
+        String api_id = this.context.getResources().getString(R.string.api_id);
+
+
+        String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + api_id;
 
         if(!strings[0].equals("")) {
             try {

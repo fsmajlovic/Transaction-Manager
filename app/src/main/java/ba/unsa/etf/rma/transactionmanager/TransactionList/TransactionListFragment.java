@@ -295,8 +295,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     c.setTime(startDate);
                     int monthCurrentNumber =  c.get(Calendar.MONTH) + 1;
                     if(monthCurrentNumber == monthSelectedNumber){
-                        System.out.println("Start date " + startDate);
-                        System.out.println("Current number " + monthCurrentNumber + " Selected number" + monthSelectedNumber + " transaction " + t.getTitle());
                         if(startDate.compareTo(firstDate) != 0) {
                             additionalTransactions.add(t);
                         }
