@@ -282,12 +282,12 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private ArrayList<Transaction> getAdditionalTransactions(ArrayList<Transaction> transactions) {
         ArrayList<Transaction> additionalTransactions = new ArrayList<Transaction>();
         additionalTransactions.clear();
-        int repeatCounter = 0;
         int monthSelectedNumber =  currentMonth.get(Calendar.MONTH) + 1;
         for(Transaction t: transactions) {
             if (t.getType().equals(Transaction.Type.REGULARPAYMENT) ||
                     (t.getType().equals(Transaction.Type.REGULARINCOME))) {
                 Date startDate = t.getDate();
+                Date firstDate = t.getDate();
                 Date endDate = t.getEndDate();
                 while (startDate.compareTo(endDate) < 0) {
                     int interval = t.getTransactionInterval();
@@ -295,10 +295,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     c.setTime(startDate);
                     int monthCurrentNumber =  c.get(Calendar.MONTH) + 1;
                     if(monthCurrentNumber == monthSelectedNumber){
-                        if(repeatCounter > 0) {
+                        System.out.println("Start date " + startDate);
+                        System.out.println("Current number " + monthCurrentNumber + " Selected number" + monthSelectedNumber + " transaction " + t.getTitle());
+                        if(startDate.compareTo(firstDate) != 0) {
                             additionalTransactions.add(t);
                         }
-                        repeatCounter++;
                     }
                     c.add(Calendar.DATE, interval);
                     startDate = c.getTime();
