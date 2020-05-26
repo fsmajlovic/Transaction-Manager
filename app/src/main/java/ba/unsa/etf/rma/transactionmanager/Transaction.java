@@ -7,11 +7,11 @@ import java.util.Date;
 
 public class Transaction implements Parcelable {
     public enum Type {
-        INDIVIDUALPAYMENT,
+        REGULARPAYMENT,
         REGULARINCOME,
         PURCHASE,
         INDIVIDUALINCOME,
-        REGULARPAYMENT
+        INDIVIDUALPAYMENT
 
     };
 
@@ -114,7 +114,7 @@ public class Transaction implements Parcelable {
 
     public void setType(Type type) {
         this.type = type;
-        if(type == Type.INDIVIDUALPAYMENT)
+        if(type == Type.REGULARPAYMENT)
             this.transactionTypeID = 1;
         else if(type == Type.REGULARINCOME)
             this.transactionTypeID = 2;
@@ -122,7 +122,7 @@ public class Transaction implements Parcelable {
             this.transactionTypeID = 3;
         else if(type == Type.INDIVIDUALINCOME)
             this.transactionTypeID = 4;
-        else if(type == Type.REGULARPAYMENT)
+        else if(type == Type.INDIVIDUALPAYMENT)
             this.transactionTypeID = 5;
     }
 

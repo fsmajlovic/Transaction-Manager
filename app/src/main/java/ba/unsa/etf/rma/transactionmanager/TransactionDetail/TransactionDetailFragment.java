@@ -46,6 +46,8 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
     private boolean eOa;
     private OnDelete oid;
     private OnRefresh or;
+    private ArrayList<Transaction> transactionsAll = new ArrayList<>();
+    private double spentOnly, monthLimit, totalLimit;
 
     private ITransactionDetailPresenter presenter;
 
@@ -98,6 +100,8 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                 intervalEditText.setText(String.valueOf(transactionParc.getTransactionInterval()));
 
 
+
+
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
                 final String receivedTitle = transactionParc.getTitle();
@@ -123,6 +127,18 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
 
             }
 
+
+        if (getArguments() != null && getArguments().containsKey("totalLimit")
+                && getArguments().containsKey("monthLimit")
+                && getArguments().containsKey("spentOnly")
+                && getArguments().containsKey("transactionsAll")) {
+            totalLimit = getArguments().getDouble("totalLimit");
+            monthLimit = getArguments().getDouble("monthLimit");
+            spentOnly = getArguments().getDouble("spentOnly");
+            transactionsAll = getArguments().getParcelableArrayList("transactionsAll");
+        }
+
+        System.out.println("LIMITI " + monthLimit +  " " + totalLimit + " " +spentOnly);
 
         try {
             oid = (OnDelete) getActivity();
@@ -446,19 +462,6 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                     Calendar calOne = Calendar.getInstance();
                     Calendar calTwo = Calendar.getInstance();
                     try {
-                        double totalLimit = 0, monthLimit = 0, spentOnly = 0;
-                        ArrayList<Transaction> transactionsAll = new ArrayList<Transaction>();
-                        if (getArguments() != null && getArguments().containsKey("totalLimit")
-                                && getArguments().containsKey("monthLimit")
-                                && getArguments().containsKey("spentOnly")
-                                && getArguments().containsKey("transactionsAll")) {
-                            totalLimit = getArguments().getDouble("totalLimit");
-                            monthLimit = getArguments().getDouble("monthLimit");
-                            spentOnly = getArguments().getDouble("spentOnly");
-                            transactionsAll = getArguments().getParcelableArrayList("transactionsAll");
-                        }
-
-
                         calTwo.setTime(sdf2.parse(dateEditText.getText().toString()));
                         monthSpent = 0.0;
                         totalSpent = spentOnly;
