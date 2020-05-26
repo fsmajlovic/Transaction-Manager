@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.transactionmanager.TransactionList;
 
+import android.content.Context;
 import android.graphics.Movie;
 import android.os.AsyncTask;
 
@@ -26,6 +27,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
+import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
 
 
@@ -35,12 +37,14 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
     private ArrayList<Transaction> transactions;
     private OnGetTransactionTypesDone callerTypes;
     private Account account;
+    private Context context;
 
     public TransactionsInteractor(){
 
     }
 
-    public TransactionsInteractor(OnGetTransactionTypesDone p) {
+    public TransactionsInteractor(Context context, OnGetTransactionTypesDone p) {
+        this.context = context;
         callerTypes = p;
         transactionsAll = new ArrayList<Transaction>();
         transactions = new ArrayList<Transaction>();
@@ -70,9 +74,9 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
     @Override
     protected Void doInBackground(String... strings) {
 
-
+        String api_id = this.context.getResources().getString(R.string.api_id);
         //Getting account info
-        String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + "1a90adbb-4968-4995-98f6-bde3431728d5";
+        String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + api_id;
         try {
             URL url = new URL(url1);
             HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -95,7 +99,7 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
 
         //Getting all transactions
         for(int page = 0; page < 10; page++) {
-            String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions/?page=" + page;
+            String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/"+api_id+"/transactions/?page=" + page;
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 URL url = new URL(url2);
@@ -142,7 +146,7 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
 
         //Getting filtered transactions
         for(int page = 0; page < 10; page++) {
-            String url3 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions/filter?page=" + page + "&" + strings[0];
+            String url3 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/"+api_id+"/transactions/filter?page=" + page + "&" + strings[0];
             try {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 URL url = new URL(url3);

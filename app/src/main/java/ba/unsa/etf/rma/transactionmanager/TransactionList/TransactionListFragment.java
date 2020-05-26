@@ -101,7 +101,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
 
     public interface OnAddItem {
-        void onItemAdd(boolean eOa);
+        void onItemAdd(boolean eOa,double totalLimit,
+                       double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll);
     }
 
     public interface OnAddTextViewClick{
@@ -150,7 +151,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     loading.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
-                    //setupForAddItem();
+                    setupForAddItem();
                 }
             });
             arrowForwardImageView.setOnClickListener(new View.OnClickListener() {
@@ -163,7 +164,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     loading.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
-                    //setupForAddItem();
+                    setupForAddItem();
                 }
             });
 
@@ -238,6 +239,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                 throw new ClassCastException(getActivity().toString() +
                         "Treba implementirati OnAddTextViewClicked");
             }
+            setupForAddItem();
 
             listView.setOnItemClickListener(listItemClickListener);
             transactionsListViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout. list_item, new ArrayList<Transaction>());
@@ -405,7 +407,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         query += "&year=";
         query += (String.valueOf(year));
 
-        getPresenter().getTransactionTypes(query);
+        getPresenter().getTransactionTypes(getActivity(), query);
 
     }
 
@@ -428,7 +430,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                         view.setBackgroundColor(Color.parseColor("#f8f8ff"));
                         counter = 0;
                         itemPosition = -1;
-                        //setupForAddItem();
+                        setupForAddItem();
                     }
                     else {
                         //listView.setItemChecked(position, true);
@@ -449,6 +451,9 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         filterTransactions();
     }
 
+    public void setupForAddItem(){
+        oai.onItemAdd(true, totalLimit, monthLimit, spentOnly, transactionsAll);
+    }
 
 
 }

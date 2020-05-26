@@ -24,8 +24,8 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
     }
 
     @Override
-    public void getTransactionTypes(String query) {
-        new TransactionsInteractor((TransactionsInteractor.OnGetTransactionTypesDone)this).execute(query);
+    public void getTransactionTypes(Context context, String query) {
+        new TransactionsInteractor(context, (TransactionsInteractor.OnGetTransactionTypesDone)this).execute(query);
     }
 
 

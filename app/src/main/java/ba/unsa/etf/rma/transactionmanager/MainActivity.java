@@ -127,9 +127,13 @@ public class MainActivity extends FragmentActivity implements TransactionListFra
     }
 
     @Override
-    public void onItemAdd(boolean eOa) {
+    public void onItemAdd(boolean eOa, double totalLimit,
+                          double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll) {
         Bundle arguments = new Bundle();
         arguments.putBoolean("editOrAdd", eOa);
+        arguments.putDouble("totalLimit", totalLimit);
+        arguments.putDouble("monthLimit", monthLimit);
+        arguments.putDouble("spentOnly", spentOnly);
         TransactionDetailFragment detailFragment = new TransactionDetailFragment();
         detailFragment.setArguments(arguments);
         if (twoPaneMode){
@@ -143,7 +147,6 @@ public class MainActivity extends FragmentActivity implements TransactionListFra
     public void onAddClicked(boolean eOa, double totalLimit,
                              double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll) {
         Bundle arguments = new Bundle();
-        arguments.putBoolean("editOrAdd", eOa);
         arguments.putBoolean("editOrAdd", eOa);
         arguments.putDouble("totalLimit", totalLimit);
         arguments.putDouble("monthLimit", monthLimit);
