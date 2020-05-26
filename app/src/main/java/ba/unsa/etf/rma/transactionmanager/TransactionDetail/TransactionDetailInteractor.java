@@ -1,5 +1,6 @@
 package ba.unsa.etf.rma.transactionmanager.TransactionDetail;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
 
 public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void> implements ITransactionDetailInteractor {
@@ -30,9 +32,11 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
     private int action;
     private ArrayList<Transaction> transactions;
     private ArrayList<Transaction> transactionsAll;
+    private Context context;
 
 
-    public TransactionDetailInteractor(int ID, Transaction transactionNew, int action){
+    public TransactionDetailInteractor(Context context, int ID, Transaction transactionNew, int action){
+        this.context = context;
         this.ID = ID;
         this.transactionNew = transactionNew;
         this.action = action;
@@ -62,12 +66,14 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
     @Override
     protected Void doInBackground(String... strings) {
 
+            String api_id = this.context.getResources().getString(R.string.api_id);
+
             URL urlPost = null;
             try {
                 if (action == 1) {
-                    urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions");
+                    urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/"+api_id+"/transactions");
                 } else if (action == 2 || action == 3) {
-                    urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions/"
+                    urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/"+api_id+"/transactions/"
                             + ID);
                 }
             } catch (MalformedURLException e) {
@@ -119,7 +125,7 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
             }
 
             for (int page = 0; page < 10; page++) {
-                String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/1a90adbb-4968-4995-98f6-bde3431728d5/transactions/?page=" + page;
+                String url2 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/"+api_id+"/transactions/?page=" + page;
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                     URL url = new URL(url2);
@@ -164,7 +170,7 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
             }
 
             try {
-                String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + "1a90adbb-4968-4995-98f6-bde3431728d5";
+                String url1 = "http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/" + api_id;
                 URL urlPostBudget = new URL(url1);
                 HttpURLConnection con = (HttpURLConnection) urlPostBudget.openConnection();
                 con.setRequestMethod("POST");

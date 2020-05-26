@@ -24,8 +24,8 @@ public class TransactionDetailPresenter implements ITransactionDetailPresenter {
     }
 
     @Override
-    public void addDeleteEdit(String query, int ID, Transaction transactionNew, int action) {
-        new TransactionDetailInteractor(ID, transactionNew, action).execute(query);
+    public void addDeleteEdit(Context context, String query, int ID, Transaction transactionNew, int action) {
+        new TransactionDetailInteractor(context, ID, transactionNew, action).execute(query);
     }
 
     //OLD

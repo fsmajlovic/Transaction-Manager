@@ -401,7 +401,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                                     if (getArguments() != null && getArguments().containsKey("transactionId")) {
                                         transID = getArguments().getInt("transactionId");
                                     }
-                                    getPresenter().addDeleteEdit("", transID, null, 3);
+                                    getPresenter().addDeleteEdit(getActivity(),"", transID, null, 3);
                                 oid.onItemDeleted(transactionParc);
 
                             }
@@ -548,13 +548,13 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
 
             if (eOa) {
                 //((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
-                getPresenter().addDeleteEdit("", 0, newTransaction, 1);
+                getPresenter().addDeleteEdit(getActivity(),"", 0, newTransaction, 1);
             } else {
                 int transID = 0;
                 if (getArguments() != null && getArguments().containsKey("transactionId")) {
                     transID = getArguments().getInt("transactionId");
                 }
-                getPresenter().addDeleteEdit("", transID, newTransaction, 2);
+                getPresenter().addDeleteEdit(getActivity(),"", transID, newTransaction, 2);
             }
             titleEditText.setBackgroundColor(Color.parseColor("#541068"));
             dateEditText.setBackgroundColor(Color.parseColor("#541068"));
