@@ -120,31 +120,4 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
         return budget;
     }
 
-
-
-
-    //OLD
-//    public TransactionsPresenter() throws ParseException {
-//        interactor = new TransactionsInteractor();
-//    }
-//
-//    public TransactionsPresenter(TransactionsInteractor interactor) throws ParseException {
-//        this.interactor = interactor;
-//    }
-//
-//    public TransactionsInteractor getInteractor() {
-//        return interactor;
-//    }
-//
-//    public void setInteractor(TransactionsInteractor interactor) {
-//        this.interactor = interactor;
-//    }
-//
-//    public void setBudget(double budget) {
-//        interactor.getAccount().setBudget(budget);
-//    }
-//
-
-
-
 }

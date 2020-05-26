@@ -44,31 +44,6 @@ public class BudgetPresenter implements IBudgetPresenter, BudgetInteractor.OnAcc
     @Override
     public void onDone(Account result) {
         account = result;
-        view.refreshView();
+        view.refreshView(account);
     }
 }
-
-//public class BudgetPresenter {
-//    private TransactionsInteractor interactor;
-//
-//
-//    public BudgetPresenter() throws ParseException {
-//        interactor = new TransactionsInteractor();
-//    }
-//
-//    public void setBudget(double budget){
-//        interactor.setBudget(budget);
-//    }
-//
-//    public void setMonthLimit(double monthLimit){
-//        interactor.setMonthLimit(monthLimit);
-//    }
-//
-//    public void setTotalLimit(double totalLimit){
-//        interactor.setTotalLimit(totalLimit);
-//    }
-//
-//    public TransactionsInteractor getInteractor() {
-//        return interactor;
-//    }
-//}

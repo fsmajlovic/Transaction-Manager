@@ -125,11 +125,10 @@ public class BudgetFragment extends Fragment implements IBudgetView {
         }
 
     @Override
-    public void refreshView() {
-        Account account = getPresenter().getAccount();
-        budgetEditText.setText(String.valueOf(account.getBudget()));
-        totalLimitEditText.setText(String.valueOf(account.getTotalLimit()));
-        monthLimitEditText.setText(String.valueOf(account.getMonthLimit()));
+    public void refreshView(Account account) {
+            budgetEditText.setText(String.valueOf(account.getBudget()));
+            totalLimitEditText.setText(String.valueOf(account.getTotalLimit()));
+            monthLimitEditText.setText(String.valueOf(account.getMonthLimit()));
     }
 
 
@@ -138,55 +137,4 @@ public class BudgetFragment extends Fragment implements IBudgetView {
         super.onResume();
     }
 }
-//        try {
-//            presenter = new BudgetPresenter();
-//            budgetEditText.setText(String.valueOf(presenter.getInteractor().getBudget()));
-//            monthLimitEditText.setText(String.valueOf(presenter.getInteractor().getMonthLimit()));
-//            totalLimitEditText.setText(String.valueOf(presenter.getInteractor().getTotalLimit()));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//
-//
 
-//
-//
-//        saveTextView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(budgetVal && monthVal && totalVal){
-//                    presenter.setBudget(Double.valueOf(budgetEditText.getText().toString()));
-//                    presenter.setMonthLimit(Double.valueOf(monthLimitEditText.getText().toString()));
-//                    presenter.setTotalLimit(Double.valueOf(totalLimitEditText.getText().toString()));
-//                }
-//                else {
-//                    new AlertDialog.Builder(getActivity(), R.style.AlertDialog)
-//                            .setTitle("Changes")
-//                            .setMessage("Seems like some of your changes might be wrong.(Red color indicates an incorrect change).")
-//                            .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//                                public void onClick(DialogInterface dialog, int which) {
-//                                }
-//                            })
-//                            .setIcon(android.R.drawable.ic_dialog_alert)
-//                            .show();
-//                }
-//            }
-//        });
-//
-//
-//        return fragmentView;
-//    }
-//
-//    @Override
-//    public void onResume() {
-//        super.onResume();
-//        try {
-//            presenter = new BudgetPresenter();
-//            budgetEditText.setText(String.valueOf(presenter.getInteractor().getBudget()));
-//            monthLimitEditText.setText(String.valueOf(presenter.getInteractor().getMonthLimit()));
-//            totalLimitEditText.setText(String.valueOf(presenter.getInteractor().getTotalLimit()));
-//        } catch (ParseException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//}
