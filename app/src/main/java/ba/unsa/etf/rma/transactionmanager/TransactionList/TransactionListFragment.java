@@ -277,7 +277,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         additionalTransactions = getAdditionalTransactions(AllTransactions);
         transactions.addAll(additionalTransactions);
         if(!transactions.isEmpty()) {
-            additionalSort(filterSpinner.getSelectedItemPosition(), transactions);
+            additionalSort(filterSpinner.getSelectedItemPosition(), transactions, additionalTransactions);
         }
     }
 
@@ -299,6 +299,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     if(monthCurrentNumber == monthSelectedNumber){
                         if(startDate.compareTo(firstDate) != 0) {
                             additionalTransactions.add(t);
+                            System.out.println(t.getTitle() + " " + monthCurrentNumber + " " + monthSelectedNumber);
                         }
                     }
                     c.add(Calendar.DATE, interval);
@@ -310,7 +311,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         return additionalTransactions;
     }
 
-    private void additionalSort(int typeId, ArrayList<Transaction> transactions) {
+    private void additionalSort(int typeId, ArrayList<Transaction> transactions, ArrayList<Transaction> additionalTransactions) {
         filteredTransactions = new ArrayList<>();
         int monthSelectedNumber =  currentMonth.get(Calendar.MONTH) + 1;
 
@@ -326,6 +327,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                 filteredTransactions.add(t);
             }
         }
+
+        filteredTransactions.addAll(additionalTransactions);
 
         String selectedSort = sortBySpinner.getSelectedItem().toString();
         if(selectedSort.equals("Price - Ascending"))

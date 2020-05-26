@@ -134,6 +134,8 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
                     String result = convertStreamToString(in);
                     JSONObject jo = new JSONObject(result);
                     JSONArray results = jo.getJSONArray("transactions");
+                    if(results.length() <= 0 )
+                        break;
                     for (int i = 0; i < results.length(); i++) {
                         JSONObject transactionJSON = results.getJSONObject(i);
                         int id = transactionJSON.getInt("id");

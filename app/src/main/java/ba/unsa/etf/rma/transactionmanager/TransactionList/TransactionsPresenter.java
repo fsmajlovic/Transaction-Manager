@@ -117,6 +117,7 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
             else if(t.getType().equals(Transaction.Type.INDIVIDUALINCOME))
                 budget += t.getAmount();
         }
+
         return budget;
     }
 
