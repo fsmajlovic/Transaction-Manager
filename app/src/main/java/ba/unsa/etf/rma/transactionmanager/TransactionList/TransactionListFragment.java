@@ -2,9 +2,11 @@ package ba.unsa.etf.rma.transactionmanager.TransactionList;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Movie;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -454,6 +456,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     public void setupForAddItem(){
         oai.onItemAdd(true, totalLimit, monthLimit, spentOnly, transactionsAll);
     }
+
 
 
 }
