@@ -1,8 +1,13 @@
 package ba.unsa.etf.rma.transactionmanager.Budget;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Resources;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Movie;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import org.json.JSONException;
@@ -24,12 +29,15 @@ import java.text.SimpleDateFormat;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
 import ba.unsa.etf.rma.transactionmanager.R;
+import ba.unsa.etf.rma.transactionmanager.Util.TransactionDBOpenHelper;
 
 public class BudgetInteractor extends AsyncTask<String, Integer, Void> implements IBudgetInteractor {
 
     Account account;
     private OnAccountSearchDone caller;
     private Context context;
+    private TransactionDBOpenHelper transactionDBOpenHelper;
+    private SQLiteDatabase database;
 
     public BudgetInteractor(Context context, OnAccountSearchDone p){
         this.context = context;
@@ -115,6 +123,7 @@ public class BudgetInteractor extends AsyncTask<String, Integer, Void> implement
 
         return null;
     }
+
 
 
     @Override

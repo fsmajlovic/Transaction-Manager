@@ -8,12 +8,28 @@ public class Account implements Parcelable {
     private double budget;
     private double totalLimit;
     private double monthLimit;
+    private Integer internalID;
 
     protected Account(Parcel in) {
         id = in.readInt();
         budget = in.readDouble();
         totalLimit = in.readDouble();
         monthLimit = in.readDouble();
+    }
+
+    public Account(double budget, double totalLimit, double monthLimit, Integer internalID) {
+        this.budget = budget;
+        this.totalLimit = totalLimit;
+        this.monthLimit = monthLimit;
+        this.internalID = internalID;
+    }
+
+    public Integer getInternalID() {
+        return internalID;
+    }
+
+    public void setInternalID(Integer internalID) {
+        this.internalID = internalID;
     }
 
     public static final Creator<Account> CREATOR = new Creator<Account>() {

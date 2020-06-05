@@ -10,4 +10,6 @@ public interface IBudgetPresenter {
     void setAccount(Parcelable account);
     Account getAccount();
     void searchAccount(Context context, String query);
+    Account getAccountFromDatabase();
+    void setAccountToDatabase(Account account);
 }

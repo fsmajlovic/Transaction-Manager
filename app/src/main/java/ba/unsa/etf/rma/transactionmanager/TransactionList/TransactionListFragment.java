@@ -269,7 +269,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             }
             });
 
-
             return fragmentView;
         }
 
@@ -456,7 +455,5 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     public void setupForAddItem(){
         oai.onItemAdd(true, totalLimit, monthLimit, spentOnly, transactionsAll);
     }
-
-
 
 }

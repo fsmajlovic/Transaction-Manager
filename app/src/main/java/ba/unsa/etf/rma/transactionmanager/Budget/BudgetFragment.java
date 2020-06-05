@@ -1,8 +1,10 @@
 package ba.unsa.etf.rma.transactionmanager.Budget;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -17,18 +19,22 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import java.text.ParseException;
+import java.util.Observable;
+import java.util.Observer;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
 import ba.unsa.etf.rma.transactionmanager.Budget.BudgetPresenter;
 import ba.unsa.etf.rma.transactionmanager.Budget.IBudgetPresenter;
 import ba.unsa.etf.rma.transactionmanager.Budget.IBudgetView;
 import ba.unsa.etf.rma.transactionmanager.R;
+import ba.unsa.etf.rma.transactionmanager.Util.NetworkChangeReceiver;
 
-public class BudgetFragment extends Fragment implements IBudgetView {
+public class BudgetFragment extends Fragment implements IBudgetView, Observer {
     private TextView budgetEditText;
     private EditText totalLimitEditText;
     private EditText monthLimitEditText;
     private TextView saveTextView;
+    private TextView offline;
     private boolean budgetVal = true, monthVal = true, totalVal = true;
 
     private IBudgetPresenter presenter;
@@ -50,9 +56,14 @@ public class BudgetFragment extends Fragment implements IBudgetView {
         totalLimitEditText = fragmentView.findViewById(R.id.TotalLimitEditText);
         monthLimitEditText = fragmentView.findViewById(R.id.monthLimitEditText);
         saveTextView = fragmentView.findViewById(R.id.saveTextView);
+        offline = fragmentView.findViewById(R.id.offline);
         //Comment cut from here
-        getPresenter().searchAccount(getActivity(), "");
-
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }
+        else{
+            offlineMode();
+        }
         monthLimitEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -103,9 +114,18 @@ public class BudgetFragment extends Fragment implements IBudgetView {
             @Override
             public void onClick(View view) {
                 if(budgetVal && monthVal && totalVal){
-                    getPresenter().searchAccount(getActivity(), "{\"budget\":" + budgetEditText.getText().toString()
-                            + ",\"monthLimit\":" + monthLimitEditText.getText().toString()
-                            + ",\"totalLimit\":" + totalLimitEditText.getText().toString() + "}");
+                    if(isNetworkAvailable(getActivity())) {
+                        getPresenter().searchAccount(getActivity(), "{\"budget\":" + budgetEditText.getText().toString()
+                                + ",\"monthLimit\":" + monthLimitEditText.getText().toString()
+                                + ",\"totalLimit\":" + totalLimitEditText.getText().toString() + "}");
+                    }
+                    else{
+                        Account accountDB = getPresenter().getAccountFromDatabase();
+                        accountDB.setBudget(Double.parseDouble(budgetEditText.getText().toString()));
+                        accountDB.setTotalLimit(Double.parseDouble(totalLimitEditText.getText().toString()));
+                        accountDB.setMonthLimit(Double.parseDouble(monthLimitEditText.getText().toString()));
+                        getPresenter().setAccountToDatabase(accountDB);
+                    }
                 }
                 else {
                     new AlertDialog.Builder(getActivity(), R.style.AlertDialog)
@@ -126,15 +146,49 @@ public class BudgetFragment extends Fragment implements IBudgetView {
 
     @Override
     public void refreshView(Account account) {
+        if(account != null) {
             budgetEditText.setText(String.valueOf(account.getBudget()));
             totalLimitEditText.setText(String.valueOf(account.getTotalLimit()));
             monthLimitEditText.setText(String.valueOf(account.getMonthLimit()));
+        }
     }
 
 
     @Override
+    public void onPause() {
+        super.onPause();
+        NetworkChangeReceiver.getObservable().deleteObserver(this);
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
+        NetworkChangeReceiver.getObservable().addObserver(this);
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+    public void onlineMode(){
+        offline.setVisibility(View.INVISIBLE);
+        getPresenter().searchAccount(getActivity(), "");
+    }
+
+    public void offlineMode(){
+        Account acc = getPresenter().getAccountFromDatabase();
+        offline.setVisibility(View.VISIBLE);
+        refreshView(acc);
     }
 }
 
