@@ -1,7 +1,9 @@
 package ba.unsa.etf.rma.transactionmanager.Graphs;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,6 +26,8 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.concurrent.TimeUnit;
 
 import ba.unsa.etf.rma.transactionmanager.Graphs.GraphPresenter;
@@ -31,8 +35,9 @@ import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.ITransactionListPresenter;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsPresenter;
+import ba.unsa.etf.rma.transactionmanager.Util.NetworkChangeReceiver;
 
-public class GraphsFragment extends Fragment implements IGraphsView{
+public class GraphsFragment extends Fragment implements IGraphsView, Observer {
     private BarChart chartOne;
     private BarChart chartTwo;
     private BarChart chartThree;
@@ -243,5 +248,53 @@ public class GraphsFragment extends Fragment implements IGraphsView{
     public void setTransactions(ArrayList<Transaction> transactions) {
         this.transactions.clear();
         this.transactions.addAll(transactions);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        NetworkChangeReceiver.getObservable().addObserver(this);
+        loading.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        NetworkChangeReceiver.getObservable().deleteObserver(this);
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+    public void onlineMode(){
+        getPresenter().getTransactions(getActivity(), "");
+    }
+
+    public void offlineMode(){
+        getPresenter().setTransactionsFromDatabase();
+        loading.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 }

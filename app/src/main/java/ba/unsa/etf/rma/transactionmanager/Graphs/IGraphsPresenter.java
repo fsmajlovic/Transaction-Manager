@@ -4,4 +4,6 @@ import android.content.Context;
 
 public interface IGraphsPresenter {
     public void getTransactions(Context context, String query);
+    void setTransactionsFromDatabase();
+
 }
