@@ -158,12 +158,22 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
     public void onPause() {
         super.onPause();
         NetworkChangeReceiver.getObservable().deleteObserver(this);
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
         NetworkChangeReceiver.getObservable().addObserver(this);
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
     }
 
     @Override
@@ -182,7 +192,9 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
 
     public void onlineMode(){
         offline.setVisibility(View.INVISIBLE);
-        getPresenter().searchAccount(getActivity(), "");
+        getPresenter().searchAccount(getActivity(), "{\"budget\":" + budgetEditText.getText().toString()
+                + ",\"monthLimit\":" + monthLimitEditText.getText().toString()
+                + ",\"totalLimit\":" + totalLimitEditText.getText().toString() + "}");
     }
 
     public void offlineMode(){

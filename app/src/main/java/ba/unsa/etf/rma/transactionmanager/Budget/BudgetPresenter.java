@@ -67,48 +67,47 @@ public class BudgetPresenter implements IBudgetPresenter, BudgetInteractor.OnAcc
 
         Account retAccount = null;
         if(cur.getCount() <= 0){
-            System.out.println("Nema elemenata u prvom cursoru");
+
         }
         else{
             cur.moveToFirst();
-            System.out.println("Ima elemenata u prvom cursoru i to " + cur.getCount());
             int internalPod = cur.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_INTERNAL_ID);
             int budgetPos = cur.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_BUDGET);
             int monthPos = cur.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT);
             int totalPos = cur.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT);
             retAccount = new Account(cur.getDouble(budgetPos), cur.getDouble(totalPos), cur.getDouble(monthPos), cur.getInt(internalPod));
-            System.out.println("Account data : " + retAccount.getBudget() + " " + retAccount.getMonthLimit() + " " + retAccount.getTotalLimit());
         }
         return retAccount;
     }
 
     @Override
     public void setAccountToDatabase(Account account) {
-        ContentResolver cr = context.getApplicationContext().getContentResolver();
-        Uri accountUri = Uri.parse("content://rma.provider.accounts/elements");
+        if(account != null) {
+            ContentResolver cr = context.getApplicationContext().getContentResolver();
+            Uri accountUri = Uri.parse("content://rma.provider.accounts/elements");
 
-        String[] kolone = new String[]{
-                TransactionDBOpenHelper.ACCOUNT_INTERNAL_ID,
-                TransactionDBOpenHelper.ACCOUNT_BUDGET,
-                TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT,
-                TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT
-        };
-        String where = null;
-        String whereArgs[] = null;
-        String order = null;
-        Cursor cur = cr.query(accountUri,kolone,where,whereArgs,order);
+            String[] kolone = new String[]{
+                    TransactionDBOpenHelper.ACCOUNT_INTERNAL_ID,
+                    TransactionDBOpenHelper.ACCOUNT_BUDGET,
+                    TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT,
+                    TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT
+            };
+            String where = null;
+            String whereArgs[] = null;
+            String order = null;
+            Cursor cur = cr.query(accountUri, kolone, where, whereArgs, order);
 
-        ContentValues values = new ContentValues();
-        values.put(TransactionDBOpenHelper.ACCOUNT_BUDGET, account.getBudget());
-        values.put(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT, account.getMonthLimit());
-        values.put(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT, account.getTotalLimit());
+            ContentValues values = new ContentValues();
+            values.put(TransactionDBOpenHelper.ACCOUNT_BUDGET, account.getBudget());
+            values.put(TransactionDBOpenHelper.ACCOUNT_MONTH_LIMIT, account.getMonthLimit());
+            values.put(TransactionDBOpenHelper.ACCOUNT_TOTAL_LIMIT, account.getTotalLimit());
 
-        if(cur.getCount() <= 0){
-            cr.insert(accountUri, values);
-        }
-        else {
-            cr.delete(accountUri, null, null);
-            cr.insert(accountUri, values);
+            if (cur.getCount() <= 0) {
+                cr.insert(accountUri, values);
+            } else {
+                cr.delete(accountUri, null, null);
+                cr.insert(accountUri, values);
+            }
         }
     }
 

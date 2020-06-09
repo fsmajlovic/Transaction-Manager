@@ -2,11 +2,14 @@ package ba.unsa.etf.rma.transactionmanager.TransactionList;
 
 import androidx.fragment.app.Fragment;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Movie;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -32,6 +35,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Locale;
+import java.util.Observable;
+import java.util.Observer;
 import java.util.Queue;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
@@ -47,9 +53,12 @@ import ba.unsa.etf.rma.transactionmanager.Comparators.TitleComparatorDescending;
 
 import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
+import ba.unsa.etf.rma.transactionmanager.Util.NetworkChangeReceiver;
+import ba.unsa.etf.rma.transactionmanager.Util.TransactionDBOpenHelper;
+import ba.unsa.etf.rma.transactionmanager.Util.TransactionListCursorAdapter;
 
 
-public class TransactionListFragment extends Fragment implements ITransactionListView{
+public class TransactionListFragment extends Fragment implements ITransactionListView, Observer {
     private Spinner filterSpinner;
     private TextView monthTextView;
     private ImageView arrowBackImageView;
@@ -69,6 +78,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private TextView loading;
     private ProgressBar progressBar;
     private double totalLimit, monthLimit, spentOnly;
+    private Cursor myCursor;
 
     //Month
     private Calendar currentMonth;
@@ -78,6 +88,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     //TransactionsList
     private TransactionsListViewAdapter transactionsListViewAdapter;
+    private TransactionListCursorAdapter transactionListCursorAdapter;
 
     //FilterBy
     private FilterBySpinnerAdapter filterBySpinnerAdapter;
@@ -94,6 +105,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         }
         return TransactionListPresenter;
     }
+
 
     //OnItemInterfaces
         public interface OnItemClick {
@@ -245,7 +257,15 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
             listView.setOnItemClickListener(listItemClickListener);
             transactionsListViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout. list_item, new ArrayList<Transaction>());
-            listView.setAdapter(transactionsListViewAdapter);
+            transactionListCursorAdapter = new TransactionListCursorAdapter(getActivity(), R.layout.list_item, null, false);
+            if(isNetworkAvailable(getActivity())) {
+                listView.setAdapter(transactionsListViewAdapter);
+            }
+            else{
+                setCursor(getPresenter().getTransactionCursor(getActivity()));
+                listView.setAdapter(transactionListCursorAdapter);
+            }
+
             listView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -292,19 +312,21 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                 Date startDate = t.getDate();
                 Date firstDate = t.getDate();
                 Date endDate = t.getEndDate();
-                while (startDate.compareTo(endDate) < 0) {
-                    int interval = t.getTransactionInterval();
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(startDate);
-                    int monthCurrentNumber =  c.get(Calendar.MONTH) + 1;
-                    if(monthCurrentNumber == monthSelectedNumber){
-                        if(startDate.compareTo(firstDate) != 0) {
-                            additionalTransactions.add(t);
-                            System.out.println(t.getTitle() + " " + monthCurrentNumber + " " + monthSelectedNumber);
+                if(endDate != null) {
+                    while (startDate.compareTo(endDate) < 0) {
+                        int interval = t.getTransactionInterval();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(startDate);
+                        int monthCurrentNumber = c.get(Calendar.MONTH) + 1;
+                        if (monthCurrentNumber == monthSelectedNumber) {
+                            if (startDate.compareTo(firstDate) != 0) {
+                                additionalTransactions.add(t);
+                                System.out.println(t.getTitle() + " " + monthCurrentNumber + " " + monthSelectedNumber);
+                            }
                         }
+                        c.add(Calendar.DATE, interval);
+                        startDate = c.getTime();
                     }
-                    c.add(Calendar.DATE, interval);
-                    startDate = c.getTime();
                 }
             }
         }
@@ -420,6 +442,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                                         int position, long id) {
                     TransactionsListViewAdapter transactionListAdapter = new TransactionsListViewAdapter(getActivity(), R.layout.list_item, filteredTransactions);
                     Transaction sendTransaction = (Transaction) listView.getItemAtPosition(position);
+                    sendTransaction.setAction(0);
+                    sendTransaction.setInternalD(-1);
 
                     if(itemPosition != position && counter == 1)
                         return;
@@ -444,16 +468,180 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                 }
             };
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        loading.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
-        filterTransactions();
-    }
+    private AdapterView.OnItemClickListener listCursorItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+            if(cursor != null) {
+                Transaction sendTransaction = getThisTransaction(cursor);
+                oic.onItemClicked(sendTransaction, false, totalLimit, monthLimit, spentOnly, transactionsAll);
+            }
+            if(itemPosition != position && counter == 1)
+                return;
+
+            if(itemPosition == position && counter == 1){
+                //listView.setItemChecked(position, false);
+                view.setBackgroundColor(Color.parseColor("#f8f8ff"));
+                counter = 0;
+                itemPosition = -1;
+                setupForAddItem();
+            }
+            else {
+                //listView.setItemChecked(position, true);
+                view.setBackgroundColor(Color.parseColor("#B8A228"));
+                counter = 1;
+                itemPosition = position;
+            }
+            transactionListCursorAdapter.notifyDataSetChanged();
+        }
+    };
 
     public void setupForAddItem(){
         oai.onItemAdd(true, totalLimit, monthLimit, spentOnly, transactionsAll);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        NetworkChangeReceiver.getObservable().addObserver(this);
+        loading.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
+        filterTransactions();
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        NetworkChangeReceiver.getObservable().deleteObserver(this);
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+    public void onlineMode(){
+        filterTransactions();
+        listView.setOnItemClickListener(listItemClickListener);
+        listView.setAdapter(transactionsListViewAdapter);
+        setAccountInfoFromDatabase();
+    }
+
+    public void offlineMode(){
+        loading.setVisibility(View.INVISIBLE);
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
+    public void setCursor(Cursor cursor){
+        myCursor = cursor;
+        transactionListCursorAdapter.changeCursor(cursor);
+        listView.setAdapter(transactionListCursorAdapter);
+        listView.setOnItemClickListener(listCursorItemClickListener);
+    }
+
+    public Transaction getThisTransaction(Cursor cursor){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+        int id = 0;
+        try{
+            int transactionIdPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_ID);
+            id = cursor.getInt(transactionIdPos);
+        }catch (IllegalArgumentException e){
+            System.out.println("My exception, ID does not exist.");
+        }
+        int titlePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_TITLE);
+        int amountPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_AMOUNT);
+        int descriptionPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_ITEM_DESCRIPTION);
+        int datePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_DATE);
+        int typePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_TYPE);
+        int intervalPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_INTERVAL);
+        int endDatePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_END_DATE);
+        int internalIdPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_INTERNAL_ID);
+        int action = 0;
+        try {
+            int actionPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_ACTION);
+            action = cursor.getInt(actionPos);
+        }
+        catch (IllegalArgumentException e){
+
+        }
+        String title = cursor.getString(titlePos);
+        double amount = cursor.getDouble(amountPos);
+        String description = cursor.getString(descriptionPos);
+        String dateString = cursor.getString(datePos);
+        String type = cursor.getString(typePos);
+        int interval = cursor.getInt(intervalPos);
+        String endDateString = cursor.getString(endDatePos);
+        int internalId = cursor.getInt(internalIdPos);
+
+
+
+        Transaction newTransaction = new Transaction();
+        newTransaction.setId(id);
+        newTransaction.setTitle(title);
+        newTransaction.setAmount(amount);
+        newTransaction.setItemDescription(description);
+        newTransaction.setAction(action);
+        newTransaction.setInternalD(internalId);
+
+        SimpleDateFormat sdf3 = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+
+        Date d1 = null;
+        try{
+            d1 = sdf3.parse(dateString);
+        }catch (Exception e){ e.printStackTrace(); }
+
+
+        newTransaction.setDate(d1);
+
+
+        if (type.equals("INDIVIDUALPAYMENT"))
+            newTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+        else if (type.equals("REGULARPAYMENT"))
+            newTransaction.setType(Transaction.Type.REGULARPAYMENT);
+        else if (type.equals("PURCHASE"))
+            newTransaction.setType(Transaction.Type.PURCHASE);
+        else if (type.equals("REGULARINCOME"))
+            newTransaction.setType(Transaction.Type.REGULARINCOME);
+        else if (type.equals("INDIVIDUALINCOME"))
+            newTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+
+
+        Date d2 = null;
+        try{
+            d2 = sdf3.parse(endDateString);
+        }catch (Exception e){ e.printStackTrace(); }
+        newTransaction.setEndDate(d2);
+
+        newTransaction.setTransactionInterval(interval);
+
+
+        return  newTransaction;
+    }
+
+    void setAccountInfoFromDatabase(){
+        Account acc = getPresenter().getAccountInfoFromDatabase();
+        globalAmountTextView.setText("Global amount: $" + String.valueOf(acc.getBudget()));
+        limitTextView.setText("Limit: $" + String.valueOf(acc.getTotalLimit()));
     }
 
 }

@@ -81,7 +81,6 @@ public class AccountContentProvider extends ContentProvider {
         catch (SQLiteException e){
             database = mHelper.getReadableDatabase();
         }
-        System.out.println("Inserting");
         long id = database.insert(TransactionDBOpenHelper.ACCOUNT_TABLE, null, contentValues);
         return uri.buildUpon().appendPath(String.valueOf(id)).build();
     }

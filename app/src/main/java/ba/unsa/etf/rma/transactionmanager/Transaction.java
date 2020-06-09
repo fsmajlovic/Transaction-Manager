@@ -25,7 +25,24 @@ public class Transaction implements Parcelable {
 
     private int id;
     private int transactionTypeID;
+    private int action;
+    private int internalD;
 
+    public int getInternalD() {
+        return internalD;
+    }
+
+    public void setInternalD(int internalD) {
+        this.internalD = internalD;
+    }
+
+    public int getAction() {
+        return action;
+    }
+
+    public void setAction(int action) {
+        this.action = action;
+    }
 
     protected Transaction(Parcel in) {
         amount = in.readDouble();

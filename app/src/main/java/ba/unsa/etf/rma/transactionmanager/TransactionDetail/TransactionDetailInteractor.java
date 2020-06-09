@@ -246,13 +246,15 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
                 Date startDate = t.getDate();
                 Date endDate = t.getEndDate();
                 int times = 0;
-                while(startDate.compareTo(endDate) < 0){
-                    int interval = t.getTransactionInterval();
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(startDate);
-                    c.add(Calendar.DATE, interval);
-                    startDate = c.getTime();
-                    times++;
+                if(endDate != null) {
+                    while (startDate.compareTo(endDate) < 0) {
+                        int interval = t.getTransactionInterval();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(startDate);
+                        c.add(Calendar.DATE, interval);
+                        startDate = c.getTime();
+                        times++;
+                    }
                 }
                 if(times == 0){
                     budget += t.getAmount();
@@ -260,23 +262,24 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
                 else
                     budget = budget + times*t.getAmount();
             }
-            else if(t.getType().equals(Transaction.Type.REGULARPAYMENT)){
+            else if(t.getType().equals(Transaction.Type.REGULARPAYMENT)) {
                 Date startDate = t.getDate();
                 Date endDate = t.getEndDate();
                 int times = 0;
-                while(startDate.compareTo(endDate) < 0){
-                    int interval = t.getTransactionInterval();
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(startDate);
-                    c.add(Calendar.DATE, interval);
-                    startDate = c.getTime();
-                    times++;
+                if (endDate != null) {
+                    while (startDate.compareTo(endDate) < 0) {
+                        int interval = t.getTransactionInterval();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(startDate);
+                        c.add(Calendar.DATE, interval);
+                        startDate = c.getTime();
+                        times++;
+                    }
+                    if (times == 0) {
+                        budget -= t.getAmount();
+                    } else
+                        budget = budget - times * t.getAmount();
                 }
-                if(times == 0){
-                    budget -= t.getAmount();
-                }
-                else
-                    budget = budget - times*t.getAmount();
             }
             else if(t.getType().equals(Transaction.Type.INDIVIDUALPAYMENT) ||
                     t.getType().equals(Transaction.Type.PURCHASE)){

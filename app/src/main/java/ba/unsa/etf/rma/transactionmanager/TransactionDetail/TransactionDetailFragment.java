@@ -1,8 +1,10 @@
 package ba.unsa.etf.rma.transactionmanager.TransactionDetail;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
 
@@ -19,6 +22,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Observable;
+import java.util.Observer;
 
 import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
@@ -26,8 +31,9 @@ import ba.unsa.etf.rma.transactionmanager.TransactionDetail.ITransactionDetailPr
 import ba.unsa.etf.rma.transactionmanager.TransactionDetail.TransactionDetailPresenter;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.ITransactionListPresenter;
 import ba.unsa.etf.rma.transactionmanager.TransactionList.TransactionsPresenter;
+import ba.unsa.etf.rma.transactionmanager.Util.NetworkChangeReceiver;
 
-public class TransactionDetailFragment extends Fragment implements ITransactionDetailView{
+public class TransactionDetailFragment extends Fragment implements ITransactionDetailView, Observer {
     private EditText titleEditText;
     private EditText dateEditText;
     private EditText amountEditText;
@@ -35,6 +41,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
     private EditText descriptionEditText;
     private EditText endDateEditText;
     private EditText intervalEditText;
+    private TextView offline;
     private Button saveBtn;
     private Button deleteBtn;
     private Transaction transactionParc;
@@ -48,6 +55,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
     private OnRefresh or;
     private ArrayList<Transaction> transactionsAll = new ArrayList<>();
     private double spentOnly, monthLimit, totalLimit;
+    private int action;
 
     private ITransactionDetailPresenter presenter;
 
@@ -83,6 +91,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
             intervalEditText = (EditText) view.findViewById(R.id.intervalEditText);
             saveBtn = (Button) view.findViewById(R.id.saveBtn);
             deleteBtn = (Button) view.findViewById(R.id.deleteBtn);
+            offline = (TextView) view.findViewById(R.id.offline);
 
             if (getArguments() != null && getArguments().containsKey("editOrAdd")) {
                 eOa = getArguments().getBoolean("editOrAdd");
@@ -98,8 +107,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                 if(transactionParc.getEndDate() != null)
                     endDateEditText.setText(transactionParc.getEndDate().toString());
                 intervalEditText.setText(String.valueOf(transactionParc.getTransactionInterval()));
-
-
+                action = transactionParc.getAction();
 
 
                 SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -127,7 +135,6 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
 
             }
 
-
         if (getArguments() != null && getArguments().containsKey("totalLimit")
                 && getArguments().containsKey("monthLimit")
                 && getArguments().containsKey("spentOnly")
@@ -137,8 +144,6 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
             spentOnly = getArguments().getDouble("spentOnly");
             transactionsAll = getArguments().getParcelableArrayList("transactionsAll");
         }
-
-        System.out.println("LIMITI " + monthLimit +  " " + totalLimit + " " +spentOnly);
 
         try {
             oid = (OnDelete) getActivity();
@@ -153,6 +158,12 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
 
             throw new ClassCastException(getActivity().toString() +
                     "Treba implementirati OnItemEdited");
+        }
+
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
         }
 
         //Disable delete button if user chose to add transaction
@@ -408,23 +419,33 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
         deleteBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                new AlertDialog.Builder(getActivity(), R.style.AlertDialog)
-                        .setTitle("Delete transaction")
-                        .setMessage("Are you sure you want to delete this transaction?")
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
+                if (deleteBtn.getText().equals("Undo")) {
+                    getPresenter().deleteTransactionFromDatabase(getThisTransaction());
+                } else {
+                    new AlertDialog.Builder(getActivity(), R.style.AlertDialog)
+                            .setTitle("Delete transaction")
+                            .setMessage("Are you sure you want to delete this transaction?")
+                            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
                                     int transID = 0;
                                     if (getArguments() != null && getArguments().containsKey("transactionId")) {
                                         transID = getArguments().getInt("transactionId");
+                                    }else {
+                                        transID = transactionParc.getId();
                                     }
-                                    getPresenter().addDeleteEdit(getActivity(),"", transID, null, 3);
-                                oid.onItemDeleted(transactionParc);
+                                    if (isNetworkAvailable(getActivity())) {
+                                        getPresenter().addDeleteEdit(getActivity(), "", transID, null, 3);
+                                    } else {
+                                        getPresenter().saveTransactionToDatabase(getThisTransaction(), 3, transID);
+                                    }
+                                    oid.onItemDeleted(transactionParc);
 
-                            }
-                        })
-                        .setNegativeButton(android.R.string.no, null)
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
+                                }
+                            })
+                            .setNegativeButton(android.R.string.no, null)
+                            .setIcon(android.R.drawable.ic_dialog_alert)
+                            .show();
+                }
             }
         });
 
@@ -520,44 +541,31 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
 
 
     public void saveMethod(){
-        try {
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-            Transaction newTransaction = new Transaction();
-            newTransaction.setTitle(titleEditText.getText().toString());
-            newTransaction.setAmount(Double.valueOf(amountEditText.getText().toString()));
-            newTransaction.setItemDescription(descriptionEditText.getText().toString());
-            newTransaction.setDate(sdf.parse(dateEditText.getText().toString()));
-            if (typeEditText.getText().toString().equals("INDIVIDUALPAYMENT"))
-                newTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
-            else if (typeEditText.getText().toString().equals("REGULARPAYMENT"))
-                newTransaction.setType(Transaction.Type.REGULARPAYMENT);
-            else if (typeEditText.getText().toString().equals("PURCHASE"))
-                newTransaction.setType(Transaction.Type.PURCHASE);
-            else if (typeEditText.getText().toString().equals("REGULARINCOME"))
-                newTransaction.setType(Transaction.Type.REGULARINCOME);
-            else if (typeEditText.getText().toString().equals("INDIVIDUALINCOME"))
-                newTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
-            try {
-                if (intervalEditText.getText().toString().equals("0")) {
-                    newTransaction.setEndDate(null);
-                } else
-                    newTransaction.setEndDate(sdf.parse(endDateEditText.getText().toString()));
-                newTransaction.setTransactionInterval(Integer.valueOf(intervalEditText.getText().toString()));
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
+            Transaction newTransaction = getThisTransaction();
 
             if (eOa) {
-                //((TransactionDetailPresenter) presenter).addTransaction(newTransaction);
-                getPresenter().addDeleteEdit(getActivity(),"", 0, newTransaction, 1);
+                if(isNetworkAvailable(getActivity())) {
+                    getPresenter().addDeleteEdit(getActivity(), "", 0, newTransaction, 1);
+                }
+                else{
+                    int transID = 0;
+                    if (getArguments() != null && getArguments().containsKey("transactionId")) {
+                        transID = getArguments().getInt("transactionId");
+                    }
+                    getPresenter().saveTransactionToDatabase(newTransaction, 1, transID);
+                }
             } else {
                 int transID = 0;
                 if (getArguments() != null && getArguments().containsKey("transactionId")) {
                     transID = getArguments().getInt("transactionId");
                 }
-                getPresenter().addDeleteEdit(getActivity(),"", transID, newTransaction, 2);
+                if(isNetworkAvailable(getActivity())) {
+                    getPresenter().addDeleteEdit(getActivity(), "", transID, newTransaction, 2);
+                }
+                else{
+                    getPresenter().saveTransactionToDatabase(newTransaction, 2, transID);
+                }
             }
             titleEditText.setBackgroundColor(Color.parseColor("#541068"));
             dateEditText.setBackgroundColor(Color.parseColor("#541068"));
@@ -567,9 +575,88 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
             endDateEditText.setBackgroundColor(Color.parseColor("#541068"));
             intervalEditText.setBackgroundColor(Color.parseColor("#541068"));
             or.refreshFragment();
+    }
+
+    @Override
+    public void update(Observable observable, Object o) {
+        if(isNetworkAvailable(getActivity())) {
+            onlineMode();
+        }else{
+            offlineMode();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        NetworkChangeReceiver.getObservable().deleteObserver(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        NetworkChangeReceiver.getObservable().addObserver(this);
+    }
+
+    public boolean isNetworkAvailable(Context context) {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+        return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
+    }
+
+    public void onlineMode(){
+        offline.setVisibility(View.INVISIBLE);
+    }
+
+    public void offlineMode(){
+        if(action == 3){
+          offline.setText("Offline brisanje");
+          deleteBtn.setText("Undo");
+        }
+        if(eOa) {
+            offline.setText("Offline dodavanje");
+        }
+        offline.setVisibility(View.VISIBLE);
+    }
+
+    public Transaction getThisTransaction(){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Transaction newTransaction = new Transaction();
+        newTransaction.setTitle(titleEditText.getText().toString());
+        newTransaction.setAmount(Double.valueOf(amountEditText.getText().toString()));
+        newTransaction.setItemDescription(descriptionEditText.getText().toString());
+        if(eOa){
+            newTransaction.setInternalD(-1);
+        }
+        else {
+            newTransaction.setInternalD(transactionParc.getInternalD());
+        }
+        try {
+            newTransaction.setDate(sdf.parse(dateEditText.getText().toString()));
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        if (typeEditText.getText().toString().equals("INDIVIDUALPAYMENT"))
+            newTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+        else if (typeEditText.getText().toString().equals("REGULARPAYMENT"))
+            newTransaction.setType(Transaction.Type.REGULARPAYMENT);
+        else if (typeEditText.getText().toString().equals("PURCHASE"))
+            newTransaction.setType(Transaction.Type.PURCHASE);
+        else if (typeEditText.getText().toString().equals("REGULARINCOME"))
+            newTransaction.setType(Transaction.Type.REGULARINCOME);
+        else if (typeEditText.getText().toString().equals("INDIVIDUALINCOME"))
+            newTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+        try {
+            if (intervalEditText.getText().toString().equals("0")) {
+                newTransaction.setEndDate(null);
+            } else
+                newTransaction.setEndDate(sdf.parse(endDateEditText.getText().toString()));
+            newTransaction.setTransactionInterval(Integer.parseInt(intervalEditText.getText().toString()));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return  newTransaction;
     }
+
 
 }

@@ -24,6 +24,10 @@
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
         <provider
+            android:authorities="rma.provider.transactions"
+            android:name=".Util.TransactionContentProvider">
+        </provider>
+        <provider
             android:authorities="rma.provider.accounts"
             android:name=".Util.AccountContentProvider">
         </provider>

@@ -1,7 +1,10 @@
 package ba.unsa.etf.rma.transactionmanager.TransactionList;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Movie;
+import android.net.Uri;
 import android.os.AsyncTask;
 
 import org.json.JSONArray;
@@ -25,10 +28,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
 
 import ba.unsa.etf.rma.transactionmanager.Account;
 import ba.unsa.etf.rma.transactionmanager.R;
 import ba.unsa.etf.rma.transactionmanager.Transaction;
+import ba.unsa.etf.rma.transactionmanager.Util.TransactionDBOpenHelper;
 
 
 public class TransactionsInteractor extends AsyncTask<String, Integer, Void> implements ITransactionInteractor {
@@ -73,6 +78,8 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
 
     @Override
     protected Void doInBackground(String... strings) {
+
+        addFromDatabaseToWeb();
 
         String api_id = this.context.getResources().getString(R.string.api_id);
         //Getting account info
@@ -208,5 +215,198 @@ public class TransactionsInteractor extends AsyncTask<String, Integer, Void> imp
     public interface OnGetTransactionTypesDone{
         public void onDoneTransactionType(ArrayList<Transaction> transactionsAll, ArrayList<Transaction> transactions, Account account);
     }
+
+
+    public void addFromDatabaseToWeb(){
+        ArrayList<Transaction> updateTransactions = GetUpdateTransactions();
+        if(updateTransactions != null){
+            for(Transaction t: updateTransactions){
+                update(t, t.getAction());
+            }
+        }
+    }
+
+
+    public void update(Transaction transactionNew, int action){
+        String api_id = this.context.getResources().getString(R.string.api_id);
+
+        URL urlPost = null;
+        try {
+            if (action == 1) {
+                urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/"+api_id+"/transactions");
+            } else if (action == 2 || action == 3) {
+                urlPost = new URL("http://rma20-app-rmaws.apps.us-west-1.starter.openshift-online.com/account/"+api_id+"/transactions/"
+                        + transactionNew.getId());
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            HttpURLConnection con = (HttpURLConnection) urlPost.openConnection();
+            if (action == 3) {
+                con.setRequestMethod("DELETE");
+            } else {
+                con.setRequestMethod("POST");
+            }
+            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Accept", "application/json");
+            con.setDoOutput(true);
+
+            if (action != 3) {
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                String strDate = dateFormat.format(transactionNew.getDate());
+                String strEndDate = "null";
+                if (transactionNew.getEndDate() != null) {
+                    strEndDate = dateFormat.format(transactionNew.getEndDate());
+                }
+                String jsonInputString = "{ \"date\": \"" + strDate + "\", \"title\": \"" +
+                        transactionNew.getTitle() + "\", \"amount\":" + String.valueOf(transactionNew.getAmount())
+                        + ", \"endDate\": \"" + strEndDate + "\", \"itemDescription\": \"" + transactionNew.getItemDescription()
+                        + "\", \"transactionInterval\": \"" + String.valueOf(transactionNew.getTransactionInterval())
+                        + "\", \"typeId\": " + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
+                System.out.println("Ovo je moj jason string " + jsonInputString + "ovo je id " + transactionNew.getId());
+                try (OutputStream os = con.getOutputStream()) {
+                    byte[] input = jsonInputString.getBytes("utf-8");
+                    os.write(input, 0, input.length);
+                }
+            }
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(con.getInputStream(), "utf-8"))) {
+                StringBuilder response = new StringBuilder();
+                String responseLine = null;
+                while ((responseLine = br.readLine()) != null) {
+                    response.append(responseLine.trim());
+                }
+                System.out.println(response.toString());
+            }
+        ContentResolver cr = context.getApplicationContext().getContentResolver();
+        Uri transactionsUri = Uri.parse("content://rma.provider.transactions/elements");
+        String transactionInternalId = String.valueOf(transactionNew.getInternalD());
+        cr.delete(transactionsUri, TransactionDBOpenHelper.TRANSACTION_INTERNAL_ID + " = ?", new String[] {transactionInternalId});
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public ArrayList<Transaction> GetUpdateTransactions(){
+        ArrayList<Transaction> updateTransactions = new ArrayList<>();
+        ContentResolver cr = context.getApplicationContext().getContentResolver();
+        Uri transactionsUri = Uri.parse("content://rma.provider.transactions/elements");
+
+        String[] columns = new String[]{
+                TransactionDBOpenHelper.TRANSACTION_INTERNAL_ID,
+                TransactionDBOpenHelper.TRANSACTION_ID,
+                TransactionDBOpenHelper.TRANSACTION_TITLE,
+                TransactionDBOpenHelper.TRANSACTION_DATE,
+                TransactionDBOpenHelper.TRANSACTION_AMOUNT,
+                TransactionDBOpenHelper.TRANSACTION_TYPE,
+                TransactionDBOpenHelper.TRANSACTION_ITEM_DESCRIPTION,
+                TransactionDBOpenHelper.TRANSACTION_INTERVAL,
+                TransactionDBOpenHelper.TRANSACTION_END_DATE,
+                TransactionDBOpenHelper.TRANSACTION_TYPE_ID,
+                TransactionDBOpenHelper.TRANSACTION_ACTION
+
+        };
+        String where = null;
+        String whereArgs[] = null;
+        String order = null;
+        Cursor cur = cr.query(transactionsUri,columns,where,whereArgs,order);
+
+        if(cur != null && cur.getCount() > 0){
+            cur.moveToFirst();
+            do{
+                Transaction newTransaction = getThisTransaction(cur);
+                updateTransactions.add(newTransaction);
+            }while(cur.moveToNext());
+            return updateTransactions;
+        }
+        return null;
+    }
+
+
+
+
+    public Transaction getThisTransaction(Cursor cursor){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+
+        int titlePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_TITLE);
+        int amountPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_AMOUNT);
+        int descriptionPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_ITEM_DESCRIPTION);
+        int datePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_DATE);
+        int typePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_TYPE);
+        int intervalPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_INTERVAL);
+        int endDatePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_END_DATE);
+        int internalIdPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_INTERNAL_ID);
+        int action = 0;
+        try {
+            int actionPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_ACTION);
+            action = cursor.getInt(actionPos);
+        }
+        catch (IllegalArgumentException e){
+
+        }
+        int id = 0;
+        try{
+            int transactionIdPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_ID);
+            id = cursor.getInt(transactionIdPos);
+        }catch (IllegalArgumentException e){
+
+        }
+        String title = cursor.getString(titlePos);
+        double amount = cursor.getDouble(amountPos);
+        String description = cursor.getString(descriptionPos);
+        String dateString = cursor.getString(datePos);
+        String type = cursor.getString(typePos);
+        int interval = cursor.getInt(intervalPos);
+        String endDateString = cursor.getString(endDatePos);
+        int internalId = cursor.getInt(internalIdPos);
+
+
+
+        Transaction newTransaction = new Transaction();
+        newTransaction.setId(id);
+        newTransaction.setTitle(title);
+        newTransaction.setAmount(amount);
+        newTransaction.setItemDescription(description);
+        newTransaction.setAction(action);
+        newTransaction.setInternalD(internalId);
+
+        SimpleDateFormat sdf3 = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+
+        Date d1 = null;
+        try{
+            d1 = sdf3.parse(dateString);
+
+        }catch (Exception e){ e.printStackTrace(); }
+
+        newTransaction.setDate(d1);
+
+        if (type.equals("INDIVIDUALPAYMENT"))
+            newTransaction.setType(Transaction.Type.INDIVIDUALPAYMENT);
+        else if (type.equals("REGULARPAYMENT"))
+            newTransaction.setType(Transaction.Type.REGULARPAYMENT);
+        else if (type.equals("PURCHASE"))
+            newTransaction.setType(Transaction.Type.PURCHASE);
+        else if (type.equals("REGULARINCOME"))
+            newTransaction.setType(Transaction.Type.REGULARINCOME);
+        else if (type.equals("INDIVIDUALINCOME"))
+            newTransaction.setType(Transaction.Type.INDIVIDUALINCOME);
+
+        Date d2 = null;
+        try{
+            d2 = sdf3.parse(endDateString);
+        }catch (Exception e){ e.printStackTrace(); }
+        newTransaction.setEndDate(d2);
+        newTransaction.setTransactionInterval(interval);
+
+
+        return  newTransaction;
+    }
+
 
 }
