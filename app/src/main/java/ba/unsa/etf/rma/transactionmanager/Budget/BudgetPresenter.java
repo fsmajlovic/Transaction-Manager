@@ -11,7 +11,10 @@ import android.graphics.Movie;
 import android.net.Uri;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 import ba.unsa.etf.rma.transactionmanager.Account;
+import ba.unsa.etf.rma.transactionmanager.Transaction;
 import ba.unsa.etf.rma.transactionmanager.Util.TransactionDBOpenHelper;
 
 public class BudgetPresenter implements IBudgetPresenter, BudgetInteractor.OnAccountSearchDone{
@@ -118,6 +121,7 @@ public class BudgetPresenter implements IBudgetPresenter, BudgetInteractor.OnAcc
         setAccountToDatabase(account);
         view.refreshView(account);
     }
+
 }
 
 

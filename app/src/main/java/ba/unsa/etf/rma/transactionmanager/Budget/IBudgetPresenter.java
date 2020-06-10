@@ -12,4 +12,5 @@ public interface IBudgetPresenter {
     void searchAccount(Context context, String query);
     Account getAccountFromDatabase();
     void setAccountToDatabase(Account account);
+
 }

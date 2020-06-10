@@ -436,7 +436,9 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                                     if (isNetworkAvailable(getActivity())) {
                                         getPresenter().addDeleteEdit(getActivity(), "", transID, null, 3);
                                     } else {
-                                        getPresenter().saveTransactionToDatabase(getThisTransaction(), 3, transID);
+                                        Transaction newTransaction = getThisTransaction();
+                                        newTransaction.setAction(3);
+                                        getPresenter().saveTransactionToDatabase(newTransaction, 3, transID);
                                     }
                                     oid.onItemDeleted(transactionParc);
 
@@ -553,6 +555,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                     if (getArguments() != null && getArguments().containsKey("transactionId")) {
                         transID = getArguments().getInt("transactionId");
                     }
+                    newTransaction.setAction(1);
                     getPresenter().saveTransactionToDatabase(newTransaction, 1, transID);
                 }
             } else {
@@ -564,6 +567,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                     getPresenter().addDeleteEdit(getActivity(), "", transID, newTransaction, 2);
                 }
                 else{
+                    newTransaction.setAction(2);
                     getPresenter().saveTransactionToDatabase(newTransaction, 2, transID);
                 }
             }

@@ -68,9 +68,6 @@ public class MainActivity extends FragmentActivity implements TransactionListFra
     @Override
     public void onItemClicked(Transaction transaction, boolean eOa, double totalLimit,
                               double monthLimit, double spentOnly, ArrayList<Transaction> transactionsAll) {
-        for(Transaction t: transactionsAll){
-            System.out.println("Alltrans:" + t.getTitle());
-        }
         Bundle arguments = new Bundle();
         arguments.putParcelable("transaction", transaction);
         arguments.putInt("transactionId", transaction.getId());

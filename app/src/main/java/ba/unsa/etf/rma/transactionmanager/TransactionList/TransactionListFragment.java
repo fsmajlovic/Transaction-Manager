@@ -262,7 +262,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                 listView.setAdapter(transactionsListViewAdapter);
             }
             else{
-                setCursor(getPresenter().getTransactionCursor(getActivity()));
+                setCursor(getPresenter().getTransactionCursor(getActivity(), currentMonth));
+                setAccountInfoFromDatabase();
                 listView.setAdapter(transactionListCursorAdapter);
             }
 
@@ -321,7 +322,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                         if (monthCurrentNumber == monthSelectedNumber) {
                             if (startDate.compareTo(firstDate) != 0) {
                                 additionalTransactions.add(t);
-                                System.out.println(t.getTitle() + " " + monthCurrentNumber + " " + monthSelectedNumber);
                             }
                         }
                         c.add(Calendar.DATE, interval);
@@ -543,10 +543,10 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         filterTransactions();
         listView.setOnItemClickListener(listItemClickListener);
         listView.setAdapter(transactionsListViewAdapter);
-        setAccountInfoFromDatabase();
     }
 
     public void offlineMode(){
+        setAccountInfoFromDatabase();
         loading.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.INVISIBLE);
     }
@@ -640,8 +640,10 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     void setAccountInfoFromDatabase(){
         Account acc = getPresenter().getAccountInfoFromDatabase();
-        globalAmountTextView.setText("Global amount: $" + String.valueOf(acc.getBudget()));
-        limitTextView.setText("Limit: $" + String.valueOf(acc.getTotalLimit()));
+        if(acc != null) {
+            globalAmountTextView.setText("Global amount: $" + String.valueOf(acc.getBudget()));
+            limitTextView.setText("Limit: $" + String.valueOf(acc.getTotalLimit()));
+        }
     }
 
 }

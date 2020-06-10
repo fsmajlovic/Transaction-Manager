@@ -130,9 +130,11 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
     }
 
     @Override
-    public Cursor getTransactionCursor(Context context){
+    public Cursor getTransactionCursor(Context context, Calendar currentMonth){
         ContentResolver cr = context.getApplicationContext().getContentResolver();
         Uri transactionsUri = Uri.parse("content://rma.provider.transactions/elements");
+
+
 
         String[] columns = new String[]{
                 TransactionDBOpenHelper.TRANSACTION_INTERNAL_ID,
