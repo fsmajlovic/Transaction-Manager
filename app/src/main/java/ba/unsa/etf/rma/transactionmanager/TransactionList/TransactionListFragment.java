@@ -168,6 +168,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
                     setupForAddItem();
+                    if(!isNetworkAvailable()){
+                        setCursor(getPresenter().getTransactionCursor(getActivity(), currentMonth));
+                        setAccountInfoFromDatabase();
+                        listView.setAdapter(transactionListCursorAdapter);
+                    }
                 }
             });
             arrowForwardImageView.setOnClickListener(new View.OnClickListener() {
@@ -181,6 +186,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     progressBar.setVisibility(View.VISIBLE);
                     filterTransactions();
                     setupForAddItem();
+                    if(!isNetworkAvailable()){
+                        setCursor(getPresenter().getTransactionCursor(getActivity(), currentMonth));
+                        setAccountInfoFromDatabase();
+                        listView.setAdapter(transactionListCursorAdapter);
+                    }
                 }
             });
 
@@ -259,7 +269,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
             listView.setOnItemClickListener(listItemClickListener);
             transactionsListViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout. list_item, new ArrayList<Transaction>());
-            transactionListCursorAdapter = new TransactionListCursorAdapter(getActivity(), R.layout.list_item, null, false);
+            transactionListCursorAdapter = new TransactionListCursorAdapter(getActivity(), R.layout.list_item, null, false, currentMonth);
             if(isNetworkAvailable()) {
                 listView.setAdapter(transactionsListViewAdapter);
             }

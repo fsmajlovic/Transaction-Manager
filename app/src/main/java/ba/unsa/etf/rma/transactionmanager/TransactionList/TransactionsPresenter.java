@@ -3,9 +3,12 @@ package ba.unsa.etf.rma.transactionmanager.TransactionList;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -134,8 +137,6 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
         ContentResolver cr = context.getApplicationContext().getContentResolver();
         Uri transactionsUri = Uri.parse("content://rma.provider.transactions/elements");
 
-
-
         String[] columns = new String[]{
                 TransactionDBOpenHelper.TRANSACTION_INTERNAL_ID,
                 TransactionDBOpenHelper.TRANSACTION_ID,
@@ -150,10 +151,10 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
                 TransactionDBOpenHelper.TRANSACTION_ACTION
 
         };
-        String where = null;
-        String whereArgs[] = null;
+
         String order = null;
-        Cursor cur = cr.query(transactionsUri,columns,where,whereArgs,order);
+        Cursor cur = cr.query(transactionsUri,columns,null,null,order);
+
         return cur;
     }
 
