@@ -45,6 +45,7 @@ public class GraphsFragment extends Fragment implements IGraphsView, Observer {
     private ArrayList<Transaction> transactions;
     private TextView loading;
     private ProgressBar progressBar;
+    private Context mContext;
 
     private IGraphsPresenter GraphPresenter;
     public IGraphsPresenter getPresenter() {
@@ -71,6 +72,7 @@ public class GraphsFragment extends Fragment implements IGraphsView, Observer {
         progressBar.setVisibility(View.VISIBLE);
         getPresenter().getTransactions(getActivity(), "");
 
+        mContext = getActivity();
         periodTextView.setText("Monthly");
         periodTextView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -256,7 +258,7 @@ public class GraphsFragment extends Fragment implements IGraphsView, Observer {
         NetworkChangeReceiver.getObservable().addObserver(this);
         loading.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -267,7 +269,7 @@ public class GraphsFragment extends Fragment implements IGraphsView, Observer {
     public void onPause() {
         super.onPause();
         NetworkChangeReceiver.getObservable().deleteObserver(this);
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -276,15 +278,15 @@ public class GraphsFragment extends Fragment implements IGraphsView, Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
         }
     }
 
-    public boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE));
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 

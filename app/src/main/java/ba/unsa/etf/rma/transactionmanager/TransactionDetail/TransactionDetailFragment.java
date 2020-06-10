@@ -56,6 +56,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
     private ArrayList<Transaction> transactionsAll = new ArrayList<>();
     private double spentOnly, monthLimit, totalLimit;
     private int action;
+    private Context mContext;
 
     private ITransactionDetailPresenter presenter;
 
@@ -82,6 +83,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
             final Bundle savedInstanceState) {
             View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
+            mContext = getActivity();
             titleEditText = (EditText) view.findViewById(R.id.titleEditText);
             dateEditText = (EditText) view.findViewById(R.id.dateEditText);
             amountEditText = (EditText) view.findViewById(R.id.amountEditText);
@@ -160,7 +162,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                     "Treba implementirati OnItemEdited");
         }
 
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -433,7 +435,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                                     }else {
                                         transID = transactionParc.getId();
                                     }
-                                    if (isNetworkAvailable(getActivity())) {
+                                    if (isNetworkAvailable()) {
                                         getPresenter().addDeleteEdit(getActivity(), "", transID, null, 3);
                                     } else {
                                         Transaction newTransaction = getThisTransaction();
@@ -547,7 +549,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
             Transaction newTransaction = getThisTransaction();
 
             if (eOa) {
-                if(isNetworkAvailable(getActivity())) {
+                if(isNetworkAvailable()) {
                     getPresenter().addDeleteEdit(getActivity(), "", 0, newTransaction, 1);
                 }
                 else{
@@ -563,7 +565,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                 if (getArguments() != null && getArguments().containsKey("transactionId")) {
                     transID = getArguments().getInt("transactionId");
                 }
-                if(isNetworkAvailable(getActivity())) {
+                if(isNetworkAvailable()) {
                     getPresenter().addDeleteEdit(getActivity(), "", transID, newTransaction, 2);
                 }
                 else{
@@ -583,7 +585,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
 
     @Override
     public void update(Observable observable, Object o) {
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -602,8 +604,8 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
         NetworkChangeReceiver.getObservable().addObserver(this);
     }
 
-    public boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE));
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 

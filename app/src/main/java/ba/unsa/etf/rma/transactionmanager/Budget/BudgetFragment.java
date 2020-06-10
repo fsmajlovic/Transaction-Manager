@@ -36,6 +36,7 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
     private TextView saveTextView;
     private TextView offline;
     private boolean budgetVal = true, monthVal = true, totalVal = true;
+    private Context mContext;
 
     private IBudgetPresenter presenter;
 
@@ -51,6 +52,7 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
+        mContext = getContext();
         View fragmentView = inflater.inflate(R.layout.fragment_budget, container, false);
         budgetEditText = fragmentView.findViewById(R.id.BudgetEditText);
         totalLimitEditText = fragmentView.findViewById(R.id.TotalLimitEditText);
@@ -58,7 +60,7 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
         saveTextView = fragmentView.findViewById(R.id.saveTextView);
         offline = fragmentView.findViewById(R.id.offline);
         //Comment cut from here
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }
         else{
@@ -114,7 +116,7 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
             @Override
             public void onClick(View view) {
                 if(budgetVal && monthVal && totalVal){
-                    if(isNetworkAvailable(getActivity())) {
+                    if(isNetworkAvailable()) {
                         getPresenter().searchAccount(getActivity(), "{\"budget\":" + budgetEditText.getText().toString()
                                 + ",\"monthLimit\":" + monthLimitEditText.getText().toString()
                                 + ",\"totalLimit\":" + totalLimitEditText.getText().toString() + "}");
@@ -158,7 +160,7 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
     public void onPause() {
         super.onPause();
         NetworkChangeReceiver.getObservable().deleteObserver(this);
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -169,7 +171,7 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
     public void onResume() {
         super.onResume();
         NetworkChangeReceiver.getObservable().addObserver(this);
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -178,15 +180,15 @@ public class BudgetFragment extends Fragment implements IBudgetView, Observer {
 
     @Override
     public void update(Observable observable, Object o) {
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
         }
     }
 
-    public boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE));
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 

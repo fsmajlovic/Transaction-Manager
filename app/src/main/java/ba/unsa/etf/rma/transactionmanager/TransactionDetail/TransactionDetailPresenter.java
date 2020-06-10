@@ -52,7 +52,7 @@ public class TransactionDetailPresenter implements ITransactionDetailPresenter {
         values.put(TransactionDBOpenHelper.TRANSACTION_ITEM_DESCRIPTION, transaction.getItemDescription());
         values.put(TransactionDBOpenHelper.TRANSACTION_INTERVAL, transaction.getTransactionInterval());
         if(transaction.getEndDate() != null) {
-            values.put(TransactionDBOpenHelper.TRANSACTION_END_DATE, transaction.getDate().toString());
+            values.put(TransactionDBOpenHelper.TRANSACTION_END_DATE, transaction.getEndDate().toString());
         }
         else {
             values.put(TransactionDBOpenHelper.TRANSACTION_END_DATE, "null");

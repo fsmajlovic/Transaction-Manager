@@ -125,27 +125,3 @@ public class BudgetPresenter implements IBudgetPresenter, BudgetInteractor.OnAcc
 }
 
 
-
-
-//        return databaseAccount;
-//        SQLiteDatabase sqldb;
-//        TransactionDBOpenHelper mHelper = new TransactionDBOpenHelper(context);
-//        try {
-//            sqldb = mHelper.getWritableDatabase();
-//        }
-//        catch (SQLiteException e){
-//            sqldb = mHelper.getReadableDatabase();
-//        }
-//        String Query = "Select * from " + TransactionDBOpenHelper.ACCOUNT_TABLE;
-//        Cursor cursor = sqldb.rawQuery(Query, null);
-//        if(cursor.getCount() <= 0){
-//            cursor.close();
-//            System.out.println("Nema nista u bazi");
-//        }
-//        else {
-//            System.out.println("Ima elemenata u bazi i to" + cursor.getCount());
-//            cursor.moveToFirst();
-//            int budgetPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.ACCOUNT_BUDGET);
-//            System.out.println("vrijednost budzeta iz baze " + cursor.getDouble(budgetPos));
-//        }
-//        cursor.close();

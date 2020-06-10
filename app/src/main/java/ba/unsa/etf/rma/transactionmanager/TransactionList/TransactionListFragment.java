@@ -79,6 +79,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     private ProgressBar progressBar;
     private double totalLimit, monthLimit, spentOnly;
     private Cursor myCursor;
+    Context mcontext;
 
     //Month
     private Calendar currentMonth;
@@ -131,6 +132,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             ViewGroup container,
             Bundle savedInstanceState) {
 
+            mcontext = getActivity();
             final View fragmentView = inflater.inflate(R.layout.fragment_list, container, false);
             filterSpinner = (Spinner) fragmentView.findViewById(R.id.filterSpinner);
             sortBySpinner = (Spinner) fragmentView.findViewById(R.id.sortBySpinner);
@@ -258,13 +260,15 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             listView.setOnItemClickListener(listItemClickListener);
             transactionsListViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout. list_item, new ArrayList<Transaction>());
             transactionListCursorAdapter = new TransactionListCursorAdapter(getActivity(), R.layout.list_item, null, false);
-            if(isNetworkAvailable(getActivity())) {
+            if(isNetworkAvailable()) {
                 listView.setAdapter(transactionsListViewAdapter);
             }
             else{
                 setCursor(getPresenter().getTransactionCursor(getActivity(), currentMonth));
                 setAccountInfoFromDatabase();
                 listView.setAdapter(transactionListCursorAdapter);
+                loading.setVisibility(View.INVISIBLE);
+                progressBar.setVisibility(View.INVISIBLE);
             }
 
             listView.setOnTouchListener(new View.OnTouchListener() {
@@ -383,8 +387,13 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     @Override
     public void setGlobalTotal(double globalAmount, double totalLimit) {
-        globalAmountTextView.setText("Global amount: $" + String.valueOf(globalAmount));
-        limitTextView.setText("Limit: $" + String.valueOf(totalLimit));
+        if(isNetworkAvailable()) {
+            globalAmountTextView.setText("Global amount: $" + String.valueOf(globalAmount));
+            limitTextView.setText("Limit: $" + String.valueOf(totalLimit));
+        }
+        else {
+            setAccountInfoFromDatabase();
+        }
     }
 
     @Override
@@ -507,7 +516,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         loading.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.VISIBLE);
         filterTransactions();
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -518,7 +527,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     public void onPause() {
         super.onPause();
         NetworkChangeReceiver.getObservable().deleteObserver(this);
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
@@ -527,15 +536,15 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
     @Override
     public void update(Observable observable, Object o) {
-        if(isNetworkAvailable(getActivity())) {
+        if(isNetworkAvailable()) {
             onlineMode();
         }else{
             offlineMode();
         }
     }
 
-    public boolean isNetworkAvailable(Context context) {
-        ConnectivityManager connectivityManager = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
+    public boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = ((ConnectivityManager) mcontext.getSystemService(Context.CONNECTIVITY_SERVICE));
         return connectivityManager.getActiveNetworkInfo() != null && connectivityManager.getActiveNetworkInfo().isConnected();
     }
 
@@ -633,8 +642,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         newTransaction.setEndDate(d2);
 
         newTransaction.setTransactionInterval(interval);
-
-
         return  newTransaction;
     }
 
