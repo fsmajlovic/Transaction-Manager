@@ -76,9 +76,11 @@ public class TransactionDetailPresenter implements ITransactionDetailPresenter {
             cursor.moveToFirst();
             int actionBeforePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_ACTION);
             int actionBefore = cursor.getInt(actionBeforePos);
-            System.out.println("Action before " + actionBefore);
             if(actionBefore == 1)
                 values.put(TransactionDBOpenHelper.TRANSACTION_ACTION, 1);
+            if(actionBefore == 1 && action == 3){
+                values.put(TransactionDBOpenHelper.TRANSACTION_ACTION, 3);
+            }
             String transactionInternalId = String.valueOf(transaction.getInternalD());
             cr.update(transactionsUri, values, TransactionDBOpenHelper.TRANSACTION_INTERNAL_ID + " = ?", new String[] {transactionInternalId});
         }
