@@ -32,20 +32,6 @@ public class TransactionListCursorAdapter extends ResourceCursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        int idPosDate = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_DATE);
-        String dateString = cursor.getString(idPosDate);
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy", Locale.ENGLISH);
-        try {
-            cal.setTime(sdf.parse(dateString));// all done
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        int month1 = cal.get(Calendar.MONTH);
-        int month2 = currentMonth.get(Calendar.MONTH);
-
-        if (month1 == month2) {
 
             ImageView image = (ImageView) view.findViewById(R.id.transactionTypeImageView);
             int idPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_TYPE_ID);
@@ -68,6 +54,5 @@ public class TransactionListCursorAdapter extends ResourceCursorAdapter {
             TextView amount = (TextView) view.findViewById(R.id.transactionAmountTextView);
             int amountPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_AMOUNT);
             amount.setText("$" + String.valueOf(cursor.getString(amountPos)));
-        }
     }
 }

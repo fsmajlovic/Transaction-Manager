@@ -148,9 +148,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             loading = (TextView) fragmentView.findViewById(R.id.loadingTextView);
             progressBar = (ProgressBar) fragmentView.findViewById(R.id.progressBar);
             progressBar.setProgressTintList(ColorStateList.valueOf(Color.RED));
-            loading.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.VISIBLE);
-
 
             //Month regulations
             currentMonth = Calendar.getInstance();
@@ -164,8 +161,10 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     monthTextView.setText(dateFormat.format(currentMonth.getTime()));
                     counter = 0;
                     itemPosition = -1;
-                    loading.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
+                    if(isNetworkAvailable()) {
+                        loading.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
                     filterTransactions();
                     setupForAddItem();
                     if(!isNetworkAvailable()){
@@ -182,8 +181,10 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
                     monthTextView.setText(dateFormat.format(currentMonth.getTime()));
                     counter = 0;
                     itemPosition = -1;
-                    loading.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
+                    if(isNetworkAvailable()) {
+                        loading.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
+                    }
                     filterTransactions();
                     setupForAddItem();
                     if(!isNetworkAvailable()){
@@ -207,9 +208,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
 
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    loading.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
-                    filterTransactions();
+                    if(isNetworkAvailable()) {
+                        loading.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
+                        filterTransactions();
+                    }
                 }
 
                 @Override
@@ -219,9 +222,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             });
 
 
-            //Filter Call
-            filterTransactions();
-
             //Filter Spinner regulations
             final String[] textArray = { "All", "Regular payment", "Regular income", "Purchase", "Individual income", "Individual payment"};
             FilterBySpinnerAdapter filterBySpinnerAdapter = new FilterBySpinnerAdapter(getActivity(),
@@ -230,9 +230,11 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             filterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                    loading.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.VISIBLE);
-                    filterTransactions();
+                    if(isNetworkAvailable()) {
+                        loading.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.VISIBLE);
+                        filterTransactions();
+                    }
                 }
 
                 @Override
@@ -271,6 +273,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             transactionsListViewAdapter = new TransactionsListViewAdapter(getActivity(), R.layout. list_item, new ArrayList<Transaction>());
             transactionListCursorAdapter = new TransactionListCursorAdapter(getActivity(), R.layout.list_item, null, false, currentMonth);
             if(isNetworkAvailable()) {
+                filterTransactions();
                 listView.setAdapter(transactionsListViewAdapter);
             }
             else{
@@ -310,8 +313,9 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     @Override
     public void setTransactions(ArrayList<Transaction> transactions, ArrayList<Transaction> AllTransactions) {
         ArrayList<Transaction> additionalTransactions = new ArrayList<Transaction>();
+        for(Transaction t: AllTransactions)
+            System.out.println("all of transactions " + t.getTitle() + " datum " + t.getDate());
         additionalTransactions = getAdditionalTransactions(AllTransactions);
-        transactions.addAll(additionalTransactions);
         if(!transactions.isEmpty()) {
             additionalSort(filterSpinner.getSelectedItemPosition(), transactions, additionalTransactions);
         }
@@ -352,6 +356,15 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         filteredTransactions = new ArrayList<>();
         int monthSelectedNumber =  currentMonth.get(Calendar.MONTH) + 1;
 
+        for(Transaction t: additionalTransactions){
+            if (typeId == 0) {
+                filteredTransactions.add(t);
+            }
+            else if (t.getTransactionTypeID() == typeId) {
+                filteredTransactions.add(t);
+            }
+        }
+
         for(Transaction t: transactions) {
             Calendar tDate = Calendar.getInstance();
             tDate.setTime(t.getDate());
@@ -365,7 +378,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             }
         }
 
-        filteredTransactions.addAll(additionalTransactions);
 
         String selectedSort = sortBySpinner.getSelectedItem().toString();
         if(selectedSort.equals("Price - Ascending"))
@@ -523,9 +535,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     public void onResume() {
         super.onResume();
         NetworkChangeReceiver.getObservable().addObserver(this);
-        loading.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.VISIBLE);
-        filterTransactions();
         if(isNetworkAvailable()) {
             onlineMode();
         }else{
@@ -559,6 +568,8 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     }
 
     public void onlineMode(){
+        loading.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.VISIBLE);
         filterTransactions();
         listView.setOnItemClickListener(listItemClickListener);
         listView.setAdapter(transactionsListViewAdapter);
@@ -578,7 +589,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     }
 
     public Transaction getThisTransaction(Cursor cursor){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         int id = 0;
         try{
@@ -622,7 +633,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
         newTransaction.setAction(action);
         newTransaction.setInternalD(internalId);
 
-        SimpleDateFormat sdf3 = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        SimpleDateFormat sdf3 = new SimpleDateFormat("dd/MM/yyyy");
 
         Date d1 = null;
         try{

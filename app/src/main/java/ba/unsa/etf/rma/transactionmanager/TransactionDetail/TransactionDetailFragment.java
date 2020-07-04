@@ -490,6 +490,7 @@ public class TransactionDetailFragment extends Fragment implements ITransactionD
                         calTwo.setTime(sdf2.parse(dateEditText.getText().toString()));
                         monthSpent = 0.0;
                         totalSpent = spentOnly;
+                        if(transactionsAll != null)
                         for (Transaction t : transactionsAll) {
                             if (t.getType().toString().equals("PURCHASE") || t.getType().toString().equals("REGULARPAYMENT") ||
                                     t.getType().toString().equals("INDIVIDUALPAYMENT")) {

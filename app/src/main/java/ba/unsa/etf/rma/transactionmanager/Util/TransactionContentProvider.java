@@ -24,7 +24,9 @@ public class TransactionContentProvider extends ContentProvider {
         uM.addURI("rma.provider.transactions","elements/#",ONEROW);
     }
 
-    TransactionDBOpenHelper mHelper;
+    TransactionDBOpenHelper mHelper =  new TransactionDBOpenHelper(getContext(),
+            TransactionDBOpenHelper.DATABASE_NAME,null,
+            TransactionDBOpenHelper.DATABASE_VERSION);
 
     @Override
     public boolean onCreate() {
@@ -44,6 +46,9 @@ public class TransactionContentProvider extends ContentProvider {
         }catch (SQLiteException e){
             database=mHelper.getReadableDatabase();
         }
+
+        createIfNotExistBackup(database);
+
         String groupby=null;
         String having=null;
         SQLiteQueryBuilder squery = new SQLiteQueryBuilder();
@@ -82,37 +87,9 @@ public class TransactionContentProvider extends ContentProvider {
             database=mHelper.getReadableDatabase();
         }
 
+        createIfNotExistBackup(database);
 
-        String TRANSACTION_TABLE = "transactions";
-        String TRANSACTION_INTERNAL_ID = "_id";
-        String TRANSACTION_ID = "id";
-        String TRANSACTION_TITLE = "title";
-        String TRANSACTION_DATE = "date";
-        String TRANSACTION_AMOUNT = "amount";
-        String TRANSACTION_TYPE = "type";
-        String TRANSACTION_ITEM_DESCRIPTION = "itemDescription";
-        String TRANSACTION_INTERVAL = "interval";
-        String TRANSACTION_END_DATE = "endDate";
-        String TRANSACTION_TYPE_ID = "typeID";
-        String TRANSACTION_ACTION = "actionParam";
-
-
-        String TRANSACTION_TABLE_CREATE =
-                "CREATE TABLE IF NOT EXISTS " + TRANSACTION_TABLE + " (" + TRANSACTION_INTERNAL_ID +
-                        " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                        + TRANSACTION_AMOUNT + " FLOAT, "
-                        + TRANSACTION_TYPE_ID + " INTEGER, "
-                        + TRANSACTION_ACTION +  " INTEGER, "
-                        + TRANSACTION_TITLE + " TEXT NOT NULL, "
-                        + TRANSACTION_ID + " INTEGER, "
-                        + TRANSACTION_INTERVAL + " INTEGER, "
-                        + TRANSACTION_DATE + " TEXT, "
-                        + TRANSACTION_END_DATE + " TEXT, "
-                        + TRANSACTION_TYPE + " TEXT, "
-                        + TRANSACTION_ITEM_DESCRIPTION + " TEXT); ";
-        database.execSQL(TRANSACTION_TABLE_CREATE);
-
-        long id = database.insert(TRANSACTION_TABLE, null, contentValues);
+        long id = database.insert(TransactionDBOpenHelper.TRANSACTION_TABLE, null, contentValues);
         return uri.buildUpon().appendPath(String.valueOf(id)).build();
     }
 
@@ -175,5 +152,36 @@ public class TransactionContentProvider extends ContentProvider {
         }
         getContext().getContentResolver().notifyChange(uri, null);
         return rowsUpdated;
+    }
+
+    void createIfNotExistBackup(SQLiteDatabase database){
+        String TRANSACTION_TABLE = "transactions";
+        String TRANSACTION_INTERNAL_ID = "_id";
+        String TRANSACTION_ID = "id";
+        String TRANSACTION_TITLE = "title";
+        String TRANSACTION_DATE = "date";
+        String TRANSACTION_AMOUNT = "amount";
+        String TRANSACTION_TYPE = "type";
+        String TRANSACTION_ITEM_DESCRIPTION = "itemDescription";
+        String TRANSACTION_INTERVAL = "interval";
+        String TRANSACTION_END_DATE = "endDate";
+        String TRANSACTION_TYPE_ID = "typeID";
+        String TRANSACTION_ACTION = "actionParam";
+
+
+        String TRANSACTION_TABLE_CREATE =
+                "CREATE TABLE IF NOT EXISTS " + TRANSACTION_TABLE + " (" + TRANSACTION_INTERNAL_ID +
+                        " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                        + TRANSACTION_AMOUNT + " FLOAT, "
+                        + TRANSACTION_TYPE_ID + " INTEGER, "
+                        + TRANSACTION_ACTION +  " INTEGER, "
+                        + TRANSACTION_TITLE + " TEXT NOT NULL, "
+                        + TRANSACTION_ID + " INTEGER, "
+                        + TRANSACTION_INTERVAL + " INTEGER, "
+                        + TRANSACTION_DATE + " TEXT, "
+                        + TRANSACTION_END_DATE + " TEXT, "
+                        + TRANSACTION_TYPE + " TEXT, "
+                        + TRANSACTION_ITEM_DESCRIPTION + " TEXT); ";
+        database.execSQL(TRANSACTION_TABLE_CREATE);
     }
 }

@@ -152,8 +152,20 @@ public class TransactionsPresenter implements ITransactionListPresenter, Transac
 
         };
 
-        String order = null;
-        Cursor cur = cr.query(transactionsUri,columns,null,null,order);
+        SimpleDateFormat format1 = new SimpleDateFormat("dd/MM/yyyy");
+
+        String formatted = format1.format(currentMonth.getTime());
+
+        String queryMonth = "";
+        int month = currentMonth.get(Calendar.MONTH) + 1;
+        if(month <= 9)
+            queryMonth = "0" + String.valueOf(month);
+        else
+            queryMonth = String.valueOf(month);
+
+        String where = "SUBSTR(" + TransactionDBOpenHelper.TRANSACTION_DATE+",4,2)=" + "'" + queryMonth + "'";
+
+        Cursor cur = cr.query(transactionsUri,columns,where,null, null);
 
         return cur;
     }

@@ -102,7 +102,7 @@ public class TransactionDetailInteractor extends AsyncTask<String, Integer, Void
                             transactionNew.getTitle() + "\", \"amount\":" + String.valueOf(transactionNew.getAmount())
                             + ", \"endDate\": \"" + strEndDate + "\", \"itemDescription\": \"" + transactionNew.getItemDescription()
                             + "\", \"transactionInterval\": \"" + String.valueOf(transactionNew.getTransactionInterval())
-                            + "\", \"typeId\": " + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
+                            + "\", \"TransactionTypeId\": " + String.valueOf(transactionNew.getTransactionTypeID()) + " }";
                     try (OutputStream os = con.getOutputStream()) {
                         byte[] input = jsonInputString.getBytes("utf-8");
                         os.write(input, 0, input.length);

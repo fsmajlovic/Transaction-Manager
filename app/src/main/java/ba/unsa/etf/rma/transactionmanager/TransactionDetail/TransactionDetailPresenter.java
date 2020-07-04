@@ -42,17 +42,25 @@ public class TransactionDetailPresenter implements ITransactionDetailPresenter {
         Uri transactionsUri = Uri.parse("content://rma.provider.transactions/elements");
 
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");;
+
+        String date = sdf.format(transaction.getDate());
+        String endDate;
+        if(transaction.getEndDate() != null)
+            endDate = sdf.format(transaction.getEndDate());
+        else
+            endDate = "null";
+
         ContentValues values = new ContentValues();
         values.put(TransactionDBOpenHelper.TRANSACTION_ID, transID);
         values.put(TransactionDBOpenHelper.TRANSACTION_TITLE, transaction.getTitle());
-        values.put(TransactionDBOpenHelper.TRANSACTION_DATE, transaction.getDate().toString());
+        values.put(TransactionDBOpenHelper.TRANSACTION_DATE, date);
         values.put(TransactionDBOpenHelper.TRANSACTION_AMOUNT, transaction.getAmount());
         values.put(TransactionDBOpenHelper.TRANSACTION_TYPE, transaction.getType().toString());
         values.put(TransactionDBOpenHelper.TRANSACTION_ITEM_DESCRIPTION, transaction.getItemDescription());
         values.put(TransactionDBOpenHelper.TRANSACTION_INTERVAL, transaction.getTransactionInterval());
         if(transaction.getEndDate() != null) {
-            values.put(TransactionDBOpenHelper.TRANSACTION_END_DATE, transaction.getEndDate().toString());
+            values.put(TransactionDBOpenHelper.TRANSACTION_END_DATE, endDate);
         }
         else {
             values.put(TransactionDBOpenHelper.TRANSACTION_END_DATE, "null");
