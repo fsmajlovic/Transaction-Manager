@@ -172,7 +172,7 @@ public class GraphsInteractor extends AsyncTask<String, Integer, Void> implement
             con.setDoOutput(true);
 
             if (action != 3) {
-                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 String strDate = dateFormat.format(transactionNew.getDate());
                 String strEndDate = "null";
                 if (transactionNew.getEndDate() != null) {
@@ -249,7 +249,7 @@ public class GraphsInteractor extends AsyncTask<String, Integer, Void> implement
 
 
     public Transaction getThisTransaction(Cursor cursor){
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
         int titlePos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_TITLE);
         int amountPos = cursor.getColumnIndexOrThrow(TransactionDBOpenHelper.TRANSACTION_AMOUNT);
@@ -293,7 +293,7 @@ public class GraphsInteractor extends AsyncTask<String, Integer, Void> implement
         newTransaction.setAction(action);
         newTransaction.setInternalD(internalId);
 
-        SimpleDateFormat sdf3 = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
+        SimpleDateFormat sdf3 = new SimpleDateFormat("dd/MM/yyyy");
 
         Date d1 = null;
         try{
@@ -324,5 +324,4 @@ public class GraphsInteractor extends AsyncTask<String, Integer, Void> implement
 
         return  newTransaction;
     }
-
 }

@@ -116,6 +116,7 @@ public class GraphsFragment extends Fragment implements IGraphsView, Observer {
 
         for(Transaction t: this.transactions){
             //Getting date from transaction
+            if(t.getDate() != null)
             date = t.getDate();
             cal.setTime(date);
             int period = 0;
