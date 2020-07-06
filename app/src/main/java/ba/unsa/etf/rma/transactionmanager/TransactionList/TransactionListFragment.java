@@ -313,8 +313,6 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
     @Override
     public void setTransactions(ArrayList<Transaction> transactions, ArrayList<Transaction> AllTransactions) {
         ArrayList<Transaction> additionalTransactions = new ArrayList<Transaction>();
-        for(Transaction t: AllTransactions)
-            System.out.println("all of transactions " + t.getTitle() + " datum " + t.getDate());
         additionalTransactions = getAdditionalTransactions(AllTransactions);
         if(!transactions.isEmpty()) {
             additionalSort(filterSpinner.getSelectedItemPosition(), transactions, additionalTransactions);
@@ -392,6 +390,7 @@ public class TransactionListFragment extends Fragment implements ITransactionLis
             Collections.sort(filteredTransactions, new DateComparatorAscending());
         else if(selectedSort.equals("Date - Descending"))
             Collections.sort(filteredTransactions, new DateComparatorDescending());
+
 
 
         transactionsListViewAdapter.setTransactions(filteredTransactions);

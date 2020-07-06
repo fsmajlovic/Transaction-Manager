@@ -139,8 +139,8 @@ public class GraphsFragment extends Fragment implements IGraphsView, Observer {
                 else if (t.getType().equals(Transaction.Type.REGULARPAYMENT)) {
                     Date startDate = t.getDate();
                     Date endDate = t.getEndDate();
-                    System.out.println("Moment before crash " + t.getTitle() + " id " + t.getId() + " type " + t.getType() + " type id " + t.getTransactionTypeID());
-                        while (startDate.compareTo(endDate) < 0) {
+                    if(endDate != null)
+                    while (startDate.compareTo(endDate) < 0) {
                             int interval = t.getTransactionInterval();
                             Calendar c = Calendar.getInstance();
                             c.setTime(startDate);
